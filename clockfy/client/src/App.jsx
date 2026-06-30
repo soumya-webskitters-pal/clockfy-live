@@ -9,6 +9,7 @@ import Timer from './components/Timer.jsx';
 import ChartPanel from './components/ChartPanel.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
 import LoginBox from './components/LoginBox.jsx';
+import AdminCreateUserPanel from './components/AdminCreateUserPanel.jsx';
 import { useApp } from './context/AppContext.jsx';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
 
@@ -32,7 +33,12 @@ export default function App() {
       <main className="main">
         {mode === 'user' && <Timer />}
         <section className={`workspaceGrid ${mode === 'admin' ? 'adminWorkspace' : 'userWorkspace'}`}>
-          {mode === 'admin' && <ProjectList />}
+          {mode === 'admin' && (
+            <div className="adminSideRail">
+              <ProjectList />
+              <AdminCreateUserPanel />
+            </div>
+          )}
           <div className="contentFlow">
             {mode === 'admin' && <AdminPanel />}
             <DashboardCards />

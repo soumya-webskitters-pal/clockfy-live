@@ -417,6 +417,7 @@ button {
 }
 
 .projectPanel,
+.adminCreateUserPanel,
 .metric,
 .chartPanel,
 .adminPanel,
@@ -433,6 +434,70 @@ button {
   align-self: start;
   border-radius: 8px;
   padding: 18px;
+}
+
+.adminSideRail {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+  display: grid;
+  gap: 14px;
+}
+
+.adminSideRail .projectPanel {
+  position: static;
+}
+
+.adminCreateUserPanel {
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.adminCreateUserPanel .panelTitle svg {
+  color: #027aa4;
+}
+
+.sideCreateUserForm {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.sideCreateUserForm label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sideCreateUserForm input {
+  min-height: 40px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 12px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.sideCreateUserForm button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 18px;
+  background: var(--primary);
+  color: white;
+  font-weight: 900;
+}
+
+.sideCreateUserForm em {
+  color: #027a48;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .panelTitle {
@@ -1120,34 +1185,6 @@ button {
   font-size: 12px;
 }
 
-.adminCreateUser {
-  display: grid;
-  grid-template-columns: minmax(220px, .9fr) minmax(220px, 1fr) auto;
-  gap: 12px;
-  align-items: center;
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--border);
-  background: var(--panel-soft);
-}
-
-.adminCreateUser div {
-  display: grid;
-  gap: 3px;
-}
-
-.adminCreateUser span {
-  color: #027aa4;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.adminCreateUser strong {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.adminCreateUser input,
 .loginForm input {
   min-height: 40px;
   border: 1px solid var(--border);
@@ -1157,7 +1194,6 @@ button {
   color: var(--text);
 }
 
-.adminCreateUser button,
 .loginForm button {
   min-height: 40px;
   border: 0;
@@ -1166,14 +1202,6 @@ button {
   background: var(--primary);
   color: white;
   font-weight: 900;
-}
-
-.adminCreateUser em {
-  grid-column: 2 / -1;
-  color: #027a48;
-  font-style: normal;
-  font-size: 13px;
-  font-weight: 800;
 }
 
 .adminCredentials {
@@ -1563,8 +1591,11 @@ button {
     height: 310px;
   }
 
+  .adminSideRail {
+    position: static;
+  }
+
   .adminPanelHead,
-  .adminCreateUser,
   .adminFilters,
   .adminWorkloadChart,
   .adminTableHead,

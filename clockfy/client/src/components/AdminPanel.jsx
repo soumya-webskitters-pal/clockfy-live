@@ -7,15 +7,12 @@ import { formatDuration } from '../utils/time.js';
 ChartJS.register(PieController, ArcElement, Tooltip);
 
 export default function AdminPanel() {
-  const { entries, projects, users, createUser, updateUserPassword, deleteUser } = useApp();
+  const { entries, projects, users, updateUserPassword, deleteUser } = useApp();
   const pieRef = useRef(null);
   const [userId, setUserId] = useState('all');
   const [projectId, setProjectId] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [newUser, setNewUser] = useState({ name: '' });
-  const [createdCredential, setCreatedCredential] = useState(null);
-  const [createError, setCreateError] = useState('');
   const [passwordEdits, setPasswordEdits] = useState({});
   const [passwordError, setPasswordError] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -100,19 +97,6 @@ export default function AdminPanel() {
     return () => chart.destroy();
   }, [userWorkload]);
 
-  async function submitUser(event) {
-    event.preventDefault();
-    setCreateError('');
-    setCreatedCredential(null);
-    try {
-      const result = await createUser(newUser);
-      setCreatedCredential(result.credential);
-      setNewUser({ name: '' });
-    } catch (error) {
-      setCreateError(error.message);
-    }
-  }
-
   async function savePassword(user) {
     setPasswordError('');
     try {
@@ -155,16 +139,6 @@ export default function AdminPanel() {
           <small>{projects.length} projects · {entries.length} entries</small>
         </div>
       </div>
-      <form className="adminCreateUser" onSubmit={submitUser}>
-        <div>
-          <span>Create user</span>
-          <strong>System generates login ID and password</strong>
-        </div>
-        <input value={newUser.name} onChange={(event) => setNewUser({ ...newUser, name: event.target.value })} placeholder="Full name" />
-        <button>Add user</button>
-        {createError && <em>{createError}</em>}
-        {createdCredential && <em>Created login · {createdCredential.loginId} / {createdCredential.password}</em>}
-      </form>
       <div className="adminCredentials">
         <div className="adminCredentialsHead">
           <span>User credentials</span>
