@@ -44,15 +44,21 @@ function makeEntry(project, date, start, end, notes) {
   startTime.setHours(sh, sm, 0, 0);
   const endTime = new Date(date);
   endTime.setHours(eh, em, 0, 0);
-  return normalizeEntry({
+  const user = starterUsers.find((item) => item.role === 'user');
+  return {
     id: crypto.randomUUID(),
+    userId: user.id,
+    userName: user.name,
     projectId: project.id,
     projectName: project.name,
     projectColor: project.color,
     startTime: startTime.toISOString(),
     endTime: endTime.toISOString(),
-    notes
-  });
+    duration: durationSeconds(startTime, endTime),
+    date: toDateKey(startTime),
+    notes,
+    updatedAt: new Date().toISOString()
+  };
 }
 
 function readJson(filePath, fallback) {
