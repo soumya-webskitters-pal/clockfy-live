@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { getEntries, getProjects, projectNameKey, saveEntries, saveProjects } from '../services/store.js';
 
 export function listProjects(_req, res) {
@@ -11,7 +12,7 @@ export function createProject(req, res) {
   const existing = projects.find((project) => projectNameKey(project.name) === projectNameKey(name));
   if (existing) return res.status(200).json(existing);
   const project = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     name,
     color: req.body.color || '#25baeb',
     favorite: Boolean(req.body.favorite),

@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { randomUUID } from 'crypto';
 import { fileURLToPath } from 'url';
 import { durationSeconds, toDateKey } from '../utils/time.js';
 
@@ -46,7 +47,7 @@ function makeEntry(project, date, start, end, notes) {
   endTime.setHours(eh, em, 0, 0);
   const user = starterUsers.find((item) => item.role === 'user');
   return {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     userId: user.id,
     userName: user.name,
     projectId: project.id,
@@ -111,7 +112,7 @@ function normalizeUser(user, existingUsers = []) {
   const safeName = user.name || starter?.name || 'User';
   const loginId = user.loginId || starter?.loginId || safeName;
   return {
-    id: user.id || crypto.randomUUID(),
+    id: user.id || randomUUID(),
     name: safeName,
     loginId: uniqueLoginId(loginId, existingUsers, user.id),
     password: user.password || starter?.password || 'user123',
@@ -175,7 +176,7 @@ export function createUser({ name }) {
   const loginId = uniqueLoginId(cleanName, users);
   const palette = ['#009688', '#5264d8', '#f59e0b', '#10b981', '#ef4444', '#25baeb'];
   const user = normalizeUser({
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     name: cleanName,
     loginId,
     password,
@@ -256,7 +257,7 @@ function normalizeProjects(projects) {
     if (seenNames.has(key)) continue;
     seenNames.add(key);
     normalized.push({
-      id: project.id || crypto.randomUUID(),
+      id: project.id || randomUUID(),
       name: String(project.name).trim().replace(/\s+/g, ' '),
       color: project.color || '#25baeb',
       favorite: Boolean(project.favorite),
@@ -285,7 +286,7 @@ export function normalizeEntry(entry) {
   const fallbackUser = users.find((user) => user.role === 'user') || starterUsers[1];
   const user = users.find((item) => item.id === entry.userId) || fallbackUser;
   return {
-    id: entry.id || crypto.randomUUID(),
+    id: entry.id || randomUUID(),
     userId: user.id,
     userName: entry.userName || user.name,
     projectId: entry.projectId,
