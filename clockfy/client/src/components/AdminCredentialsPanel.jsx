@@ -1,4 +1,4 @@
-import { KeyRound } from 'lucide-react';
+import { ChevronDown, KeyRound } from 'lucide-react';
 import { useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 
@@ -6,6 +6,7 @@ export default function AdminCredentialsPanel() {
   const { users, updateUserPassword, deleteUser } = useApp();
   const [passwordEdits, setPasswordEdits] = useState({});
   const [panelError, setPanelError] = useState('');
+  const [openUsers, setOpenUsers] = useState({});
   const normalUsers = users.filter((user) => user.role === 'user');
 
   async function savePassword(user) {
@@ -44,20 +45,37 @@ export default function AdminCredentialsPanel() {
         {panelError && <em>{panelError}</em>}
       </div>
       <div className="credentialTable">
-        {normalUsers.map((user) => (
-          <div className="credentialTableRow" key={user.id}>
-            <span>{user.name}</span>
-            <code>{user.loginId}</code>
-            <input
-              value={passwordEdits[user.id] ?? user.password ?? ''}
-              onChange={(event) => setPasswordEdits({ ...passwordEdits, [user.id]: event.target.value })}
-            />
-            <div className="credentialActions">
-              <button type="button" onClick={() => savePassword(user)}>Save</button>
-              <button type="button" className="danger" onClick={() => removeUser(user)}>Delete</button>
-            </div>
+        {normalUsers.map((user) => {
+          const isOpen = Boolean(openUsers[user.id]);
+          return (
+          <div className={`credentialTableRow ${isOpen ? 'open' : ''}`} key={user.id}>
+            <button
+              className="credentialAccordionButton"
+              type="button"
+              onClick={() => setOpenUsers((current) => ({ ...current, [user.id]: !current[user.id] }))}
+              aria-expanded={isOpen}
+            >
+              <span>{user.name}</span>
+              <code>{user.loginId}</code>
+              <ChevronDown size={17} />
+            </button>
+            {isOpen && (
+              <div className="credentialAccordionBody">
+                <label>
+                  Password
+                  <input
+                    value={passwordEdits[user.id] ?? user.password ?? ''}
+                    onChange={(event) => setPasswordEdits({ ...passwordEdits, [user.id]: event.target.value })}
+                  />
+                </label>
+                <div className="credentialActions">
+                  <button type="button" onClick={() => savePassword(user)}>Save</button>
+                  <button type="button" className="danger" onClick={() => removeUser(user)}>Delete</button>
+                </div>
+              </div>
+            )}
           </div>
-        ))}
+        );})}
       </div>
     </aside>
   );

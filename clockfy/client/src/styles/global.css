@@ -1249,8 +1249,6 @@ button {
   display: grid;
   grid-template-columns: 1fr;
   align-items: stretch;
-  gap: 8px;
-  padding: 12px;
 }
 
 .credentialTableHead {
@@ -1269,22 +1267,66 @@ button {
   border-top: 0;
 }
 
-.credentialTableRow > span {
-  font-weight: 900;
+.credentialAccordionButton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 17px;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 0;
+  padding: 10px 12px;
+  background: var(--panel);
+  color: var(--text);
+  text-align: left;
 }
 
-.credentialTableRow code {
+.credentialAccordionButton span {
+  min-width: 0;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.credentialAccordionButton code {
+  max-width: 94px;
   padding: 5px 8px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--panel-soft);
   color: var(--text);
   font-size: 13px;
-  white-space: normal;
-  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.credentialTableRow input {
+.credentialAccordionButton svg {
+  color: var(--muted);
+  transition: transform .18s ease;
+}
+
+.credentialTableRow.open .credentialAccordionButton svg {
+  transform: rotate(180deg);
+}
+
+.credentialAccordionBody {
+  display: grid;
+  gap: 10px;
+  padding: 0 12px 12px;
+}
+
+.credentialAccordionBody label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.credentialAccordionBody input {
   min-height: 36px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -1300,7 +1342,7 @@ button {
   gap: 8px;
 }
 
-.credentialTableRow button {
+.credentialActions button {
   flex: 1;
   min-height: 36px;
   border: 0;
@@ -1311,7 +1353,7 @@ button {
   font-weight: 900;
 }
 
-.credentialTableRow button.danger {
+.credentialActions button.danger {
   background: #fee4e2;
   color: #b42318;
 }
