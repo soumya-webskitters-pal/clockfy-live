@@ -418,6 +418,7 @@ button {
 
 .projectPanel,
 .adminCreateUserPanel,
+.adminCredentials,
 .metric,
 .chartPanel,
 .adminPanel,
@@ -1207,8 +1208,8 @@ button {
 .adminCredentials {
   display: grid;
   gap: 12px;
-  padding: 16px 22px;
-  border-bottom: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px;
   background: var(--panel);
 }
 
@@ -1220,6 +1221,9 @@ button {
 }
 
 .adminCredentialsHead span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #027aa4;
   font-size: 12px;
   font-weight: 900;
@@ -1243,10 +1247,10 @@ button {
 .credentialTableHead,
 .credentialTableRow {
   display: grid;
-  grid-template-columns: minmax(140px, 1fr) minmax(130px, .8fr) minmax(150px, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 8px;
+  padding: 12px;
 }
 
 .credentialTableHead {
@@ -1261,6 +1265,14 @@ button {
   border-top: 1px solid var(--border);
 }
 
+.credentialTableRow:first-child {
+  border-top: 0;
+}
+
+.credentialTableRow > span {
+  font-weight: 900;
+}
+
 .credentialTableRow code {
   padding: 5px 8px;
   border: 1px solid var(--border);
@@ -1268,6 +1280,8 @@ button {
   background: var(--panel-soft);
   color: var(--text);
   font-size: 13px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .credentialTableRow input {
@@ -1277,15 +1291,17 @@ button {
   padding: 0 10px;
   background: var(--panel);
   color: var(--text);
+  width: 100%;
 }
 
 .credentialActions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: stretch;
   gap: 8px;
 }
 
 .credentialTableRow button {
+  flex: 1;
   min-height: 36px;
   border: 0;
   border-radius: 6px;

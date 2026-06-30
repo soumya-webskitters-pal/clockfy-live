@@ -10,6 +10,7 @@ import ChartPanel from './components/ChartPanel.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
 import LoginBox from './components/LoginBox.jsx';
 import AdminCreateUserPanel from './components/AdminCreateUserPanel.jsx';
+import AdminCredentialsPanel from './components/AdminCredentialsPanel.jsx';
 import { useApp } from './context/AppContext.jsx';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
 
@@ -37,6 +38,7 @@ export default function App() {
             <div className="adminSideRail">
               <ProjectList />
               <AdminCreateUserPanel />
+              <AdminCredentialsPanel />
             </div>
           )}
           <div className="contentFlow">

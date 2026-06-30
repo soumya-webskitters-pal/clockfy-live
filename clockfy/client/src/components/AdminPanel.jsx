@@ -7,15 +7,12 @@ import { formatDuration } from '../utils/time.js';
 ChartJS.register(PieController, ArcElement, Tooltip);
 
 export default function AdminPanel() {
-  const { entries, projects, users, updateUserPassword, deleteUser } = useApp();
+  const { entries, projects, users } = useApp();
   const pieRef = useRef(null);
   const [userId, setUserId] = useState('all');
   const [projectId, setProjectId] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [passwordEdits, setPasswordEdits] = useState({});
-  const [passwordError, setPasswordError] = useState('');
-  const [deleteError, setDeleteError] = useState('');
   const normalUsers = users.filter((user) => user.role === 'user');
   const filteredEntries = useMemo(() => entries.filter((entry) => {
     const afterStart = !fromDate || entry.date >= fromDate;
@@ -64,6 +61,12 @@ export default function AdminPanel() {
   const pieColors = ['#25baeb', '#10b981', '#f59e0b', '#5264d8', '#ef4444', '#8b5cf6', '#14b8a6'];
 
   useEffect(() => {
+    if (userId !== 'all' && !normalUsers.some((user) => user.id === userId)) {
+      setUserId('all');
+    }
+  }, [normalUsers, userId]);
+
+  useEffect(() => {
     if (!pieRef.current) return undefined;
     if (!userWorkload.length) return undefined;
 
@@ -97,36 +100,6 @@ export default function AdminPanel() {
     return () => chart.destroy();
   }, [userWorkload]);
 
-  async function savePassword(user) {
-    setPasswordError('');
-    try {
-      await updateUserPassword(user.id, passwordEdits[user.id] ?? user.password);
-      setPasswordEdits((current) => {
-        const next = { ...current };
-        delete next[user.id];
-        return next;
-      });
-    } catch (error) {
-      setPasswordError(error.message);
-    }
-  }
-
-  async function removeUser(user) {
-    setDeleteError('');
-    if (!window.confirm(`Remove ${user.name}? This will also remove this user's tracked time.`)) return;
-    try {
-      await deleteUser(user.id);
-      if (userId === user.id) setUserId('all');
-      setPasswordEdits((current) => {
-        const next = { ...current };
-        delete next[user.id];
-        return next;
-      });
-    } catch (error) {
-      setDeleteError(error.message);
-    }
-  }
-
   return (
     <section className="adminPanel">
       <div className="adminPanelHead">
@@ -137,34 +110,6 @@ export default function AdminPanel() {
         <div className="adminTotals">
           <strong>{formatDuration(totalTime)}</strong>
           <small>{projects.length} projects · {entries.length} entries</small>
-        </div>
-      </div>
-      <div className="adminCredentials">
-        <div className="adminCredentialsHead">
-          <span>User credentials</span>
-          {(passwordError || deleteError) && <em>{passwordError || deleteError}</em>}
-        </div>
-        <div className="credentialTable">
-          <div className="credentialTableHead">
-            <span>Name</span>
-            <span>Login ID</span>
-            <span>Password</span>
-            <span>Action</span>
-          </div>
-          {normalUsers.map((user) => (
-            <div className="credentialTableRow" key={user.id}>
-              <span>{user.name}</span>
-              <code>{user.loginId}</code>
-              <input
-                value={passwordEdits[user.id] ?? user.password ?? ''}
-                onChange={(event) => setPasswordEdits({ ...passwordEdits, [user.id]: event.target.value })}
-              />
-              <div className="credentialActions">
-                <button type="button" onClick={() => savePassword(user)}>Save</button>
-                <button type="button" className="danger" onClick={() => removeUser(user)}>Delete</button>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
       <div className="adminFilters">
