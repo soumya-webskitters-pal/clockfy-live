@@ -1,0 +1,14 @@
+{
+  "name": "clockfy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "build": "npm --workspace client run build",
+    "start": "npm --workspace server start"
+  }
+}

@@ -30,6 +30,27 @@ npm run dev
 
 Open `http://localhost:5173`.
 
+## Railway deploy
+
+Deploy this repo as one Railway service from GitHub.
+
+Railway settings:
+
+```bash
+Build command: npm run build
+Start command: npm start
+```
+
+Generate a public domain in Railway after deploy. The Express server serves both the REST API and the built React app in production.
+
+For persistent JSON storage, add a Railway volume mounted at:
+
+```bash
+/app/server/data
+```
+
+Without a volume, JSON data can reset during redeploys.
+
 ## API
 
 - `GET /api/users`
