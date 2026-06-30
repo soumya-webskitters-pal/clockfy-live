@@ -1,0 +1,9 @@
+{
+  "name": "clockfy-live-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd clockfy && npm install && npm run build",
+    "start": "cd clockfy && npm start"
+  }
+}
