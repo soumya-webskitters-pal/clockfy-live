@@ -1,10 +1,14 @@
+import { ArcElement, Chart as ChartJS, PieController, Tooltip } from 'chart.js';
 import { ShieldCheck } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { formatDuration } from '../utils/time.js';
 
+ChartJS.register(PieController, ArcElement, Tooltip);
+
 export default function AdminPanel() {
   const { entries, projects, users, createUser, updateUserPassword, deleteUser } = useApp();
+  const pieRef = useRef(null);
   const [userId, setUserId] = useState('all');
   const [projectId, setProjectId] = useState('all');
   const [fromDate, setFromDate] = useState('');
@@ -44,6 +48,57 @@ export default function AdminPanel() {
   }, [filteredEntries]);
 
   const totalTime = totals.reduce((sum, item) => sum + item.duration, 0);
+  const projectName = projectId === 'all' ? 'all projects' : projects.find((project) => project.id === projectId)?.name || 'selected project';
+  const userWorkload = useMemo(() => {
+    const map = new Map();
+    filteredEntries.forEach((entry) => {
+      const current = map.get(entry.userId) || {
+        userName: entry.userName || 'Unknown user',
+        duration: 0,
+        entries: 0
+      };
+      current.duration += Number(entry.duration || 0);
+      current.entries += 1;
+      map.set(entry.userId, current);
+    });
+    return [...map.values()].sort((a, b) => b.duration - a.duration);
+  }, [filteredEntries]);
+  const topWorker = userWorkload[0];
+  const pieColors = ['#25baeb', '#10b981', '#f59e0b', '#5264d8', '#ef4444', '#8b5cf6', '#14b8a6'];
+
+  useEffect(() => {
+    if (!pieRef.current) return undefined;
+    if (!userWorkload.length) return undefined;
+
+    const chart = new ChartJS(pieRef.current, {
+      type: 'pie',
+      data: {
+        labels: userWorkload.map((item) => item.userName),
+        datasets: [{
+          data: userWorkload.map((item) => item.duration),
+          backgroundColor: userWorkload.map((_, index) => pieColors[index % pieColors.length]),
+          borderColor: '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const item = userWorkload[context.dataIndex];
+                return `${item.userName}: ${formatDuration(item.duration)}`;
+              }
+            }
+          }
+        }
+      }
+    });
+    return () => chart.destroy();
+  }, [userWorkload]);
 
   async function submitUser(event) {
     event.preventDefault();
@@ -161,6 +216,29 @@ export default function AdminPanel() {
           To
           <input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
         </label>
+      </div>
+      <div className="adminWorkloadChart">
+        <div className="adminChartCopy">
+          <span>Most worked</span>
+          <strong>{topWorker ? topWorker.userName : 'No tracked time'}</strong>
+          <small>
+            {topWorker
+              ? `${formatDuration(topWorker.duration)} in ${projectName}`
+              : `No entries found for ${projectName}`}
+          </small>
+        </div>
+        <div className="adminPieWrap">
+          {userWorkload.length ? <canvas ref={pieRef} /> : <div className="adminChartEmpty">No data</div>}
+        </div>
+        <div className="adminChartLegend">
+          {userWorkload.map((item, index) => (
+            <span key={item.userName}>
+              <i style={{ background: pieColors[index % pieColors.length] }} />
+              {item.userName}
+              <b>{formatDuration(item.duration)}</b>
+            </span>
+          ))}
+        </div>
       </div>
       <div className="adminTable">
         <div className="adminTableHead">
