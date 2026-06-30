@@ -2,9 +2,12 @@
   "name": "clockfy-client",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "NODE_OPTIONS=--max-old-space-size=1024 vite build",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -2,8 +2,11 @@
   "name": "clockfy-live-root",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "build": "cd clockfy && npm install && npm run build",
+    "build": "cd clockfy && npm ci && npm --workspace client run build",
     "start": "cd clockfy && npm start"
   }
 }
