@@ -661,6 +661,7 @@ button {
 
 .input,
 .dateInput,
+.clientSelect,
 .searchBar input,
 .editTimes input,
 .notesEdit {
@@ -675,6 +676,7 @@ button {
 
 .input:focus,
 .dateInput:focus,
+.clientSelect:focus,
 .searchBar input:focus,
 .editTimes input:focus,
 .notesEdit:focus {
@@ -809,11 +811,24 @@ button {
   text-overflow: ellipsis;
 }
 
-.projectName span {
+.projectName > span:first-child {
   width: 9px;
   height: 9px;
   border-radius: 50%;
   flex: 0 0 auto;
+}
+
+.projectNameText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.projectName small {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .filled {
@@ -842,7 +857,7 @@ button {
 }
 
 .singlePanelPage .projectForm {
-  grid-template-columns: minmax(240px, 1fr) minmax(140px, 180px) auto;
+  grid-template-columns: minmax(240px, 1fr) minmax(160px, 220px) minmax(140px, 180px) auto;
   align-items: center;
 }
 

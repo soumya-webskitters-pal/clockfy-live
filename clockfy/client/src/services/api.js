@@ -211,6 +211,8 @@ function normalizeProject(project) {
     id: project.id || randomId('project'),
     recordId: project.recordId || null,
     name: String(project.name || 'Untitled project').trim().replace(/\s+/g, ' '),
+    clientId: project.clientId || '',
+    clientName: project.clientName || '',
     color: project.color || '#25baeb',
     favorite: Boolean(project.favorite),
     pinned: Boolean(project.pinned),
@@ -224,6 +226,8 @@ function projectFromRecord(record) {
     id: fields['Project ID'] || record.id,
     recordId: record.id,
     name: fields.Name,
+    clientId: fields['Client ID'],
+    clientName: fields['Client Name'],
     color: fields.Color,
     favorite: fields.Favorite,
     pinned: fields.Pinned,
@@ -235,6 +239,8 @@ function projectToFields(project) {
   return {
     Name: project.name,
     'Project ID': project.id,
+    'Client ID': project.clientId || '',
+    'Client Name': project.clientName || '',
     Color: project.color,
     Favorite: project.favorite,
     Pinned: project.pinned,
@@ -471,12 +477,15 @@ async function deleteUser(id) {
 async function createProject(payload) {
   const name = String(payload.name || '').trim();
   if (!name) throw new Error('Project name is required');
-  const projects = await getProjects();
+  const [projects, clients] = await Promise.all([getProjects(), getClients()]);
   const existing = projects.find((project) => projectNameKey(project.name) === projectNameKey(name));
   if (existing) return existing;
+  const client = payload.clientId ? clients.find((item) => item.id === payload.clientId) : null;
   const project = normalizeProject({
     id: randomId('project'),
     name,
+    clientId: client?.id || '',
+    clientName: client?.name || '',
     color: payload.color || '#25baeb',
     favorite: Boolean(payload.favorite),
     pinned: Boolean(payload.pinned),
@@ -487,15 +496,18 @@ async function createProject(payload) {
 }
 
 async function updateProject(id, payload) {
-  const projects = await getProjects();
+  const [projects, clients] = await Promise.all([getProjects(), getClients()]);
   const project = projects.find((item) => item.id === id);
   if (!project?.recordId) throw new Error('Project not found');
   const nextName = payload.name?.trim() || project.name;
   const duplicate = projects.find((item) => item.id !== project.id && projectNameKey(item.name) === projectNameKey(nextName));
   if (duplicate) throw new Error('Project name already exists');
+  const client = payload.clientId ? clients.find((item) => item.id === payload.clientId) : null;
   const next = normalizeProject({
     ...project,
     name: nextName,
+    clientId: payload.clientId !== undefined ? client?.id || '' : project.clientId,
+    clientName: payload.clientId !== undefined ? client?.name || '' : project.clientName,
     color: payload.color || project.color,
     favorite: payload.favorite ?? project.favorite,
     pinned: payload.pinned ?? project.pinned,

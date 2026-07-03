@@ -18,6 +18,8 @@ Fields:
 Fields:
 - `Name`
 - `Project ID`
+- `Client ID`
+- `Client Name`
 - `Color`
 - `Favorite`
 - `Pinned`

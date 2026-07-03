@@ -20,8 +20,9 @@ const colors = [
 ];
 
 export default function ProjectList() {
-  const { projects, selectedProjectId, setSelectedProjectId, createProject } = useApp();
+  const { projects, clients, selectedProjectId, setSelectedProjectId, createProject } = useApp();
   const [name, setName] = useState('');
+  const [clientId, setClientId] = useState('');
   const [color, setColor] = useState(colors[0][1]);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const colorDropdownRef = useRef(null);
@@ -38,7 +39,7 @@ export default function ProjectList() {
   async function submit(event) {
     event.preventDefault();
     if (!name.trim()) return;
-    await createProject({ name, color });
+    await createProject({ name, color, clientId });
     setName('');
   }
 
@@ -50,6 +51,10 @@ export default function ProjectList() {
       </div>
       <form className="projectForm" onSubmit={submit}>
         <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="New task" />
+        <select className="clientSelect" value={clientId} onChange={(event) => setClientId(event.target.value)} aria-label="Task client">
+          <option value="">{clients.length ? 'No client' : 'No clients yet'}</option>
+          {clients.map((client) => <option value={client.id} key={client.id}>{client.name}</option>)}
+        </select>
         <div className="colorDropdown" style={{ '--selected-color': color }} ref={colorDropdownRef}>
           <button type="button" className="colorDropdownButton" onClick={() => setColorMenuOpen((open) => !open)} aria-expanded={colorMenuOpen}>
             <span />
@@ -83,7 +88,8 @@ export default function ProjectList() {
           <div className={`projectItem taskOnly ${selectedProjectId === project.id ? 'current' : ''}`} key={project.id}>
             <button className="projectName" onClick={() => setSelectedProjectId(project.id)}>
               <span style={{ background: project.color }} />
-              {project.name}
+              <span className="projectNameText">{project.name}</span>
+              {project.clientName && <small>{project.clientName}</small>}
             </button>
           </div>
         ))}
