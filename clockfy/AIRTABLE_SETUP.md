@@ -20,6 +20,7 @@ Fields:
 - `Project ID`
 - `Client ID`
 - `Client Name`
+- `Subtasks`
 - `Color`
 - `Favorite`
 - `Pinned`

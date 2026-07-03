@@ -1,4 +1,4 @@
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import Button from './Button.jsx';
@@ -23,6 +23,8 @@ export default function ProjectList() {
   const { projects, clients, selectedProjectId, setSelectedProjectId, createProject } = useApp();
   const [name, setName] = useState('');
   const [clientId, setClientId] = useState('');
+  const [subtasks, setSubtasks] = useState([]);
+  const [subtaskDraft, setSubtaskDraft] = useState('');
   const [color, setColor] = useState(colors[0][1]);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const colorDropdownRef = useRef(null);
@@ -38,9 +40,26 @@ export default function ProjectList() {
 
   async function submit(event) {
     event.preventDefault();
-    if (!name.trim()) return;
-    await createProject({ name, color, clientId });
+    const nextSubtasks = [...subtasks, subtaskDraft]
+      .map((item) => item.trim().replace(/\s+/g, ' '))
+      .filter(Boolean);
+    if (!name.trim() || !clientId || !nextSubtasks.length) return;
+    await createProject({ name, color, clientId, subtasks: nextSubtasks });
     setName('');
+    setClientId('');
+    setSubtasks([]);
+    setSubtaskDraft('');
+  }
+
+  function addSubtask() {
+    const next = subtaskDraft.trim().replace(/\s+/g, ' ');
+    if (!next) return;
+    setSubtasks((items) => (items.some((item) => item.toLowerCase() === next.toLowerCase()) ? items : [...items, next]));
+    setSubtaskDraft('');
+  }
+
+  function removeSubtask(item) {
+    setSubtasks((items) => items.filter((subtask) => subtask !== item));
   }
 
   return (
@@ -50,11 +69,40 @@ export default function ProjectList() {
         <span>{projects.length}</span>
       </div>
       <form className="projectForm" onSubmit={submit}>
-        <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="New task" />
-        <select className="clientSelect" value={clientId} onChange={(event) => setClientId(event.target.value)} aria-label="Task client">
-          <option value="">{clients.length ? 'No client' : 'No clients yet'}</option>
+        <Input value={name} onChange={(event) => setName(event.target.value)} placeholder="Task name" required />
+        <select className="clientSelect" value={clientId} onChange={(event) => setClientId(event.target.value)} aria-label="Task client" required>
+          <option value="">{clients.length ? 'Select client' : 'Create a client first'}</option>
           {clients.map((client) => <option value={client.id} key={client.id}>{client.name}</option>)}
         </select>
+        <div className="subtaskBuilder">
+          <div className="subtaskInputRow">
+            <Input
+              value={subtaskDraft}
+              onChange={(event) => setSubtaskDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  addSubtask();
+                }
+              }}
+              placeholder="Subtask"
+            />
+            <button type="button" className="iconButton subtaskAddButton" onClick={addSubtask} title="Add subtask" aria-label="Add subtask">
+              <Plus size={16} />
+            </button>
+          </div>
+          <div className="subtaskChips" aria-label="Subtasks">
+            {subtasks.map((item) => (
+              <span key={item}>
+                {item}
+                <button type="button" onClick={() => removeSubtask(item)} aria-label={`Remove ${item}`}>
+                  <X size={13} />
+                </button>
+              </span>
+            ))}
+            {!subtasks.length && <em>At least one subtask required</em>}
+          </div>
+        </div>
         <div className="colorDropdown" style={{ '--selected-color': color }} ref={colorDropdownRef}>
           <button type="button" className="colorDropdownButton" onClick={() => setColorMenuOpen((open) => !open)} aria-expanded={colorMenuOpen}>
             <span />
@@ -81,7 +129,7 @@ export default function ProjectList() {
             </div>
           )}
         </div>
-        <Button><Plus size={16} /> Add</Button>
+        <Button disabled={!name.trim() || !clientId || (!subtasks.length && !subtaskDraft.trim())}><Plus size={16} /> Add</Button>
       </form>
       <div className="projectList">
         {projects.map((project) => (
@@ -89,6 +137,7 @@ export default function ProjectList() {
             <button className="projectName" onClick={() => setSelectedProjectId(project.id)}>
               <span style={{ background: project.color }} />
               <span className="projectNameText">{project.name}</span>
+              {!!project.subtasks?.length && <small>{project.subtasks.length} subtasks</small>}
               {project.clientName && <small>{project.clientName}</small>}
             </button>
           </div>

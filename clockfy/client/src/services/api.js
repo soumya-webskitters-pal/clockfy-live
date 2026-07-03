@@ -121,6 +121,33 @@ function clientNameKey(name) {
   return String(name || '').trim().replace(/\s+/g, ' ').toLowerCase();
 }
 
+function normalizeSubtasks(subtasks) {
+  const values = Array.isArray(subtasks)
+    ? subtasks
+    : String(subtasks || '')
+      .split(/\n|,/);
+  const seen = new Set();
+  return values
+    .map((item) => String(item || '').trim().replace(/\s+/g, ' '))
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function parseSubtasks(value) {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return normalizeSubtasks(parsed);
+  } catch {
+    return normalizeSubtasks(value);
+  }
+}
+
 function slugifyLoginId(value) {
   return String(value || 'user')
     .trim()
@@ -213,6 +240,7 @@ function normalizeProject(project) {
     name: String(project.name || 'Untitled project').trim().replace(/\s+/g, ' '),
     clientId: project.clientId || '',
     clientName: project.clientName || '',
+    subtasks: normalizeSubtasks(project.subtasks),
     color: project.color || '#25baeb',
     favorite: Boolean(project.favorite),
     pinned: Boolean(project.pinned),
@@ -228,6 +256,7 @@ function projectFromRecord(record) {
     name: fields.Name,
     clientId: fields['Client ID'],
     clientName: fields['Client Name'],
+    subtasks: parseSubtasks(fields.Subtasks),
     color: fields.Color,
     favorite: fields.Favorite,
     pinned: fields.Pinned,
@@ -241,6 +270,7 @@ function projectToFields(project) {
     'Project ID': project.id,
     'Client ID': project.clientId || '',
     'Client Name': project.clientName || '',
+    Subtasks: JSON.stringify(project.subtasks || []),
     Color: project.color,
     Favorite: project.favorite,
     Pinned: project.pinned,
@@ -477,15 +507,20 @@ async function deleteUser(id) {
 async function createProject(payload) {
   const name = String(payload.name || '').trim();
   if (!name) throw new Error('Project name is required');
+  if (!payload.clientId) throw new Error('Client name is required');
+  const subtasks = normalizeSubtasks(payload.subtasks);
+  if (!subtasks.length) throw new Error('At least one subtask is required');
   const [projects, clients] = await Promise.all([getProjects(), getClients()]);
   const existing = projects.find((project) => projectNameKey(project.name) === projectNameKey(name));
   if (existing) return existing;
   const client = payload.clientId ? clients.find((item) => item.id === payload.clientId) : null;
+  if (!client) throw new Error('Valid client is required');
   const project = normalizeProject({
     id: randomId('project'),
     name,
     clientId: client?.id || '',
     clientName: client?.name || '',
+    subtasks,
     color: payload.color || '#25baeb',
     favorite: Boolean(payload.favorite),
     pinned: Boolean(payload.pinned),
@@ -503,11 +538,15 @@ async function updateProject(id, payload) {
   const duplicate = projects.find((item) => item.id !== project.id && projectNameKey(item.name) === projectNameKey(nextName));
   if (duplicate) throw new Error('Project name already exists');
   const client = payload.clientId ? clients.find((item) => item.id === payload.clientId) : null;
+  const subtasks = payload.subtasks !== undefined ? normalizeSubtasks(payload.subtasks) : project.subtasks;
+  if (payload.clientId !== undefined && !client) throw new Error('Valid client is required');
+  if (!subtasks.length) throw new Error('At least one subtask is required');
   const next = normalizeProject({
     ...project,
     name: nextName,
     clientId: payload.clientId !== undefined ? client?.id || '' : project.clientId,
     clientName: payload.clientId !== undefined ? client?.name || '' : project.clientName,
+    subtasks,
     color: payload.color || project.color,
     favorite: payload.favorite ?? project.favorite,
     pinned: payload.pinned ?? project.pinned,
