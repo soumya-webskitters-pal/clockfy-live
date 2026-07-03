@@ -25,6 +25,7 @@ export default function ProjectList() {
   const [clientId, setClientId] = useState('');
   const [subtasks, setSubtasks] = useState([]);
   const [subtaskDraft, setSubtaskDraft] = useState('');
+  const [error, setError] = useState('');
   const [color, setColor] = useState(colors[0][1]);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const colorDropdownRef = useRef(null);
@@ -40,21 +41,36 @@ export default function ProjectList() {
 
   async function submit(event) {
     event.preventDefault();
+    setError('');
     const nextSubtasks = [...subtasks, subtaskDraft]
       .map((item) => item.trim().replace(/\s+/g, ' '))
       .filter(Boolean);
     if (!name.trim() || !clientId || !nextSubtasks.length) return;
-    await createProject({ name, color, clientId, subtasks: nextSubtasks });
-    setName('');
-    setClientId('');
-    setSubtasks([]);
-    setSubtaskDraft('');
+    const subtaskKeys = nextSubtasks.map((item) => item.toLowerCase());
+    if (new Set(subtaskKeys).size !== subtaskKeys.length) {
+      setError('Subtask name already exists');
+      return;
+    }
+    try {
+      await createProject({ name, color, clientId, subtasks: nextSubtasks });
+      setName('');
+      setClientId('');
+      setSubtasks([]);
+      setSubtaskDraft('');
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   function addSubtask() {
+    setError('');
     const next = subtaskDraft.trim().replace(/\s+/g, ' ');
     if (!next) return;
-    setSubtasks((items) => (items.some((item) => item.toLowerCase() === next.toLowerCase()) ? items : [...items, next]));
+    if (subtasks.some((item) => item.toLowerCase() === next.toLowerCase())) {
+      setError('Subtask name already exists');
+      return;
+    }
+    setSubtasks((items) => [...items, next]);
     setSubtaskDraft('');
   }
 
@@ -102,6 +118,7 @@ export default function ProjectList() {
             ))}
             {!subtasks.length && <em>At least one subtask required</em>}
           </div>
+          {error && <em className="formError">{error}</em>}
         </div>
         <div className="colorDropdown" style={{ '--selected-color': color }} ref={colorDropdownRef}>
           <button type="button" className="colorDropdownButton" onClick={() => setColorMenuOpen((open) => !open)} aria-expanded={colorMenuOpen}>

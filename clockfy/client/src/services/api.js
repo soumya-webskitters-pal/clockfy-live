@@ -138,6 +138,21 @@ function normalizeSubtasks(subtasks) {
     });
 }
 
+function duplicateSubtaskName(subtasks) {
+  const seen = new Set();
+  const values = Array.isArray(subtasks)
+    ? subtasks
+    : String(subtasks || '')
+      .split(/\n|,/);
+  for (const item of values) {
+    const key = String(item || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    if (!key) continue;
+    if (seen.has(key)) return key;
+    seen.add(key);
+  }
+  return '';
+}
+
 function parseSubtasks(value) {
   if (!value) return [];
   try {
@@ -508,6 +523,7 @@ async function createProject(payload) {
   const name = String(payload.name || '').trim();
   if (!name) throw new Error('Project name is required');
   if (!payload.clientId) throw new Error('Client name is required');
+  if (duplicateSubtaskName(payload.subtasks)) throw new Error('Subtask name already exists');
   const subtasks = normalizeSubtasks(payload.subtasks);
   if (!subtasks.length) throw new Error('At least one subtask is required');
   const [projects, clients] = await Promise.all([getProjects(), getClients()]);
@@ -538,6 +554,7 @@ async function updateProject(id, payload) {
   const duplicate = projects.find((item) => item.id !== project.id && projectNameKey(item.name) === projectNameKey(nextName));
   if (duplicate) throw new Error('Project name already exists');
   const client = payload.clientId ? clients.find((item) => item.id === payload.clientId) : null;
+  if (payload.subtasks !== undefined && duplicateSubtaskName(payload.subtasks)) throw new Error('Subtask name already exists');
   const subtasks = payload.subtasks !== undefined ? normalizeSubtasks(payload.subtasks) : project.subtasks;
   if (payload.clientId !== undefined && !client) throw new Error('Valid client is required');
   if (!subtasks.length) throw new Error('At least one subtask is required');
@@ -578,7 +595,7 @@ async function createClient(payload) {
   if (!name) throw new Error('Client name is required');
   const clients = await getClients();
   const existing = clients.find((client) => clientNameKey(client.name) === clientNameKey(name));
-  if (existing) return existing;
+  if (existing) throw new Error('Client name already exists');
   const client = normalizeClient({
     id: randomId('client'),
     name,

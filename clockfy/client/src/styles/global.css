@@ -847,6 +847,13 @@ button {
   font-weight: 750;
 }
 
+.formError {
+  color: #b42318;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .projectList {
   margin-top: 14px;
   display: grid;
