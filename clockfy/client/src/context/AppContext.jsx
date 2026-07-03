@@ -7,6 +7,7 @@ const timeEditorRoles = new Set(['admin', 'super-user']);
 
 export function AppProvider({ children }) {
   const [projects, setProjects] = useState([]);
+  const [clients, setClients] = useState([]);
   const [users, setUsers] = useState([]);
   const [entries, setEntries] = useState([]);
   const [dashboard, setDashboard] = useState(null);
@@ -30,10 +31,11 @@ export function AppProvider({ children }) {
   }, []);
 
   const refresh = useCallback(async () => {
-    const [userData, projectData, entryData] = await Promise.all([api.getUsers(), api.getProjects(), api.getEntries()]);
+    const [userData, projectData, clientData, entryData] = await Promise.all([api.getUsers(), api.getProjects(), api.getClients(), api.getEntries()]);
     const dashboardData = await api.getDashboard();
     setUsers(userData);
     setProjects(projectData);
+    setClients(clientData);
     setEntries(entryData);
     setDashboard(dashboardData);
     setSelectedProjectId((current) => current || projectData[0]?.id || '');
@@ -72,6 +74,36 @@ export function AppProvider({ children }) {
     await api.deleteProject(id);
     await refresh();
     notify('Project deleted');
+  };
+
+  const createClient = async (payload) => {
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can add clients');
+      return;
+    }
+    await api.createClient(payload);
+    await refresh();
+    notify('Client created');
+  };
+
+  const updateClient = async (id, payload) => {
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can update clients');
+      return;
+    }
+    await api.updateClient(id, payload);
+    await refresh();
+    notify('Client updated');
+  };
+
+  const deleteClient = async (id) => {
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can delete clients');
+      return;
+    }
+    await api.deleteClient(id);
+    await refresh();
+    notify('Client deleted');
   };
 
   const createEntry = async (payload) => {
@@ -226,6 +258,7 @@ export function AppProvider({ children }) {
 
   const value = useMemo(() => ({
     projects,
+    clients,
     users,
     entries,
     currentUser,
@@ -259,6 +292,9 @@ export function AppProvider({ children }) {
     createProject,
     updateProject,
     deleteProject,
+    createClient,
+    updateClient,
+    deleteClient,
     createEntry,
     stopEntry,
     deleteTimerEntry,
@@ -269,7 +305,7 @@ export function AppProvider({ children }) {
     deleteTargetTimer,
     exportData,
     importData
-  }), [projects, users, entries, dashboard, currentUser, selectedProjectId, search, filter, customDate, loading, toast, darkMode, mode, activePage, timerRequest, activeTimer, timerCommand]);
+  }), [projects, clients, users, entries, dashboard, currentUser, selectedProjectId, search, filter, customDate, loading, toast, darkMode, mode, activePage, timerRequest, activeTimer, timerCommand]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

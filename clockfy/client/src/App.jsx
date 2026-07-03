@@ -12,6 +12,7 @@ import AdminCreateUserPanel from './components/AdminCreateUserPanel.jsx';
 import AdminCredentialsPanel from './components/AdminCredentialsPanel.jsx';
 import SuperUserReviewPanel from './components/SuperUserReviewPanel.jsx';
 import AdminAnalyticsPanel from './components/AdminAnalyticsPanel.jsx';
+import ClientsPanel from './components/ClientsPanel.jsx';
 import { useApp } from './context/AppContext.jsx';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts.js';
 import { useEffect } from 'react';
@@ -23,16 +24,18 @@ export default function App() {
   const isAdminTimePage = mode === 'admin' && activePage === 'home';
   const isAdminAnalyticsPage = mode === 'admin' && activePage === 'admin-analytics';
   const isAdminTasksPage = mode === 'admin' && activePage === 'admin-tasks';
+  const isAdminClientsPage = mode === 'admin' && activePage === 'admin-clients';
   const isAdminUsersPage = mode === 'admin' && activePage === 'admin-users';
   const isSuperTimePage = mode === 'super-user' && activePage === 'super-time';
   const isSuperStatsPage = mode === 'super-user' && activePage === 'super-stats';
   const isSuperTasksPage = mode === 'super-user' && activePage === 'super-tasks';
+  const isSuperClientsPage = mode === 'super-user' && activePage === 'super-clients';
   useKeyboardShortcuts({ onNewProject: () => canManageTasks && document.querySelector('.projectForm input')?.focus() });
 
   useEffect(() => {
-    if (mode !== 'super-user' && ['team', 'super-time', 'super-stats', 'super-tasks'].includes(activePage)) setActivePage('home');
+    if (mode !== 'super-user' && ['team', 'super-time', 'super-stats', 'super-tasks', 'super-clients'].includes(activePage)) setActivePage('home');
     if (mode === 'super-user' && activePage === 'team') setActivePage('home');
-    if (mode !== 'admin' && ['admin-analytics', 'admin-tasks', 'admin-users'].includes(activePage)) setActivePage('home');
+    if (mode !== 'admin' && ['admin-analytics', 'admin-tasks', 'admin-clients', 'admin-users'].includes(activePage)) setActivePage('home');
   }, [activePage, mode, setActivePage]);
 
   if (!currentUser) {
@@ -49,7 +52,7 @@ export default function App() {
       <Header />
       <Sidebar />
       <main className="main hasSidebar">
-        {!isAdminTimePage && !isAdminAnalyticsPage && !isAdminTasksPage && !isAdminUsersPage && !isSuperTimePage && !isSuperStatsPage && !isSuperTasksPage && canTrackTime && <Timer />}
+        {!isAdminTimePage && !isAdminAnalyticsPage && !isAdminTasksPage && !isAdminClientsPage && !isAdminUsersPage && !isSuperTimePage && !isSuperStatsPage && !isSuperTasksPage && !isSuperClientsPage && canTrackTime && <Timer />}
         {isAdminTimePage || isSuperTimePage ? (
           <SuperUserReviewPanel />
         ) : isAdminAnalyticsPage || isSuperStatsPage ? (
@@ -57,6 +60,10 @@ export default function App() {
         ) : isAdminTasksPage || isSuperTasksPage ? (
           <section className="singlePanelPage">
             <ProjectList />
+          </section>
+        ) : isAdminClientsPage || isSuperClientsPage ? (
+          <section className="singlePanelPage">
+            <ClientsPanel />
           </section>
         ) : isAdminUsersPage ? (
           <section className="singlePanelPage userAdminPage">

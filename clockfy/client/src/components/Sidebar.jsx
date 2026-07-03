@@ -1,4 +1,4 @@
-import { BarChart3, Clock3, FolderKanban, UserPlus } from 'lucide-react';
+import { BarChart3, Building2, Clock3, FolderKanban, UserPlus } from 'lucide-react';
 import { useApp } from '../context/AppContext.jsx';
 
 export default function Sidebar() {
@@ -39,6 +39,15 @@ export default function Sidebar() {
           <span>Tasks</span>
         </button>
         <button
+          className={activePage === 'admin-clients' ? 'active' : ''}
+          onClick={() => setActivePage('admin-clients')}
+          title="Clients"
+          aria-label="Clients"
+        >
+          <Building2 size={21} />
+          <span>Clients</span>
+        </button>
+        <button
           className={activePage === 'admin-users' ? 'active' : ''}
           onClick={() => setActivePage('admin-users')}
           title="Users"
@@ -68,6 +77,15 @@ export default function Sidebar() {
         >
           <BarChart3 size={21} />
           <span>Stats</span>
+        </button>
+        <button
+          className={activePage === 'super-clients' ? 'active' : ''}
+          onClick={() => setActivePage('super-clients')}
+          title="Clients"
+          aria-label="Clients"
+        >
+          <Building2 size={21} />
+          <span>Clients</span>
         </button>
         <button
           className={activePage === 'super-tasks' ? 'active' : ''}

@@ -41,6 +41,13 @@ Fields:
 - `Status`
 - `Updated At`
 
+## Clients
+
+Fields:
+- `Name`
+- `Client ID`
+- `Updated At`
+
 ## Local Environment
 
 Copy `clockfy/client/.env.example` to `clockfy/client/.env`, then add your Airtable personal access token:

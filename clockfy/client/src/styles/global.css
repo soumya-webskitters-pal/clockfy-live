@@ -424,6 +424,7 @@ button {
 }
 
 .projectPanel,
+.clientsPanel,
 .adminCreateUserPanel,
 .adminCredentials,
 .metric,
@@ -444,6 +445,128 @@ button {
   align-self: start;
   border-radius: 8px;
   padding: 16px;
+}
+
+.clientsPanel {
+  display: grid;
+  gap: 14px;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.clientsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.clientsHead span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #027aa4;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.clientsHead h2 {
+  margin: 5px 0 0;
+  font-size: 20px;
+}
+
+.clientsHead strong {
+  color: var(--muted);
+}
+
+.clientCreateForm {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.clientCreateForm .button {
+  min-width: 124px;
+}
+
+.clientCreateForm em {
+  grid-column: 1 / -1;
+  color: #b42318;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.clientsList {
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.clientRow {
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 120px 36px 36px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.clientRow:last-child {
+  border-bottom: 0;
+}
+
+.clientRow svg {
+  color: var(--muted);
+}
+
+.clientRow span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 850;
+}
+
+.clientRow small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.clientRow input {
+  min-height: 34px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.clientRow button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.clientRow button.danger {
+  background: #fee4e2;
+  color: #b42318;
+}
+
+.clientsEmpty {
+  padding: 16px;
+  color: var(--muted);
+  font-weight: 850;
 }
 
 .adminSideRail {
@@ -2134,6 +2257,20 @@ button {
 
   .sideCreateUserForm {
     grid-template-columns: 1fr;
+  }
+
+  .clientCreateForm,
+  .clientRow {
+    grid-template-columns: 1fr;
+  }
+
+  .clientRow {
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .clientRow > svg {
+    display: none;
   }
 
   .credentialAccordionBody {

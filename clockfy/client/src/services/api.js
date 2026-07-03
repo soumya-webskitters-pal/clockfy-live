@@ -5,7 +5,8 @@ const AIRTABLE_API = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
 const TABLES = {
   users: 'Users',
   projects: 'Projects',
-  entries: 'Time Entries'
+  entries: 'Time Entries',
+  clients: 'Clients'
 };
 
 const starterUsers = [
@@ -113,6 +114,10 @@ function monthStart() {
 }
 
 function projectNameKey(name) {
+  return String(name || '').trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function clientNameKey(name) {
   return String(name || '').trim().replace(/\s+/g, ' ').toLowerCase();
 }
 
@@ -237,6 +242,43 @@ function projectToFields(project) {
   };
 }
 
+function normalizeClient(client) {
+  return {
+    id: client.id || randomId('client'),
+    recordId: client.recordId || null,
+    name: String(client.name || 'Untitled client').trim().replace(/\s+/g, ' '),
+    updatedAt: client.updatedAt || new Date().toISOString()
+  };
+}
+
+function clientFromRecord(record) {
+  const fields = record.fields || {};
+  return normalizeClient({
+    id: fields['Client ID'] || record.id,
+    recordId: record.id,
+    name: fields.Name,
+    updatedAt: fields['Updated At']
+  });
+}
+
+function clientToFields(client) {
+  return {
+    Name: client.name,
+    'Client ID': client.id,
+    'Updated At': client.updatedAt
+  };
+}
+
+function uniqueClients(clients) {
+  const seen = new Set();
+  return clients.filter((client) => {
+    const key = `${client.id}:${clientNameKey(client.name)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function uniqueProjects(projects) {
   const seen = new Set();
   return projects.filter((project) => {
@@ -324,6 +366,11 @@ async function getProjects() {
   await projectsSeedPromise;
   projectsSeedPromise = null;
   return uniqueProjects((await listRecords(TABLES.projects)).map(projectFromRecord));
+}
+
+async function getClients() {
+  return uniqueClients((await listRecords(TABLES.clients)).map(clientFromRecord))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 async function getEntries() {
@@ -475,6 +522,40 @@ async function deleteProject(id) {
   await deleteRecord(TABLES.projects, project.recordId);
 }
 
+async function createClient(payload) {
+  const name = String(payload.name || '').trim();
+  if (!name) throw new Error('Client name is required');
+  const clients = await getClients();
+  const existing = clients.find((client) => clientNameKey(client.name) === clientNameKey(name));
+  if (existing) return existing;
+  const client = normalizeClient({
+    id: randomId('client'),
+    name,
+    updatedAt: new Date().toISOString()
+  });
+  const record = await createRecord(TABLES.clients, clientToFields(client));
+  return clientFromRecord(record);
+}
+
+async function updateClient(id, payload) {
+  const clients = await getClients();
+  const client = clients.find((item) => item.id === id);
+  if (!client?.recordId) throw new Error('Client not found');
+  const name = String(payload.name || '').trim();
+  if (!name) throw new Error('Client name is required');
+  const duplicate = clients.find((item) => item.id !== id && clientNameKey(item.name) === clientNameKey(name));
+  if (duplicate) throw new Error('Client name already exists');
+  const next = normalizeClient({ ...client, name, updatedAt: new Date().toISOString() });
+  const record = await updateRecord(TABLES.clients, client.recordId, clientToFields(next));
+  return clientFromRecord(record);
+}
+
+async function deleteClient(id) {
+  const client = (await getClients()).find((item) => item.id === id);
+  if (!client?.recordId) throw new Error('Client not found');
+  await deleteRecord(TABLES.clients, client.recordId);
+}
+
 async function createEntry(payload) {
   const [users, projects] = await Promise.all([getUsers(), getProjects()]);
   const user = users.find((item) => item.id === payload.userId);
@@ -541,6 +622,7 @@ async function restoreData() {
 
 export const api = {
   getProjects,
+  getClients,
   getUsers,
   login,
   createUser,
@@ -550,6 +632,9 @@ export const api = {
   createProject,
   updateProject,
   deleteProject,
+  createClient,
+  updateClient,
+  deleteClient,
   getEntries,
   createEntry,
   updateEntry,
