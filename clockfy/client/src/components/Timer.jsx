@@ -1,4 +1,4 @@
-import { CircleDollarSign, MoreVertical, Pause, Play, RotateCcw, Square, Tag } from 'lucide-react';
+import { MoreVertical, Pause, Play, RotateCcw, Square } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 import { formatDuration } from '../utils/time.js';
@@ -190,8 +190,6 @@ export default function Timer() {
         {selectedProject?.subtasks.map((subtask) => <option value={subtask} key={subtask}>{subtask}</option>)}
       </select>
       <span className="currentProject"><i style={{ background: selectedProject?.color || '#009688' }} />{selectedProject?.clientName || 'Client'} / {selectedProject?.name || 'Project'} {selectedSubtask && <b>- {selectedSubtask}</b>}</span>
-      <button className="iconCell" title="Tag"><Tag size={20} /></button>
-      <button className="iconCell money" title="Billable"><CircleDollarSign size={23} /></button>
       <strong className="timerValue">{formatDuration(elapsed)}</strong>
       {status === 'idle' && <Button className="startBtn" onClick={start} disabled={busy || !canStart}><Play size={16} /> Start</Button>}
       {status !== 'idle' && <Button className="stopBtn" onClick={stop} disabled={busy}><Square size={14} /> Stop</Button>}

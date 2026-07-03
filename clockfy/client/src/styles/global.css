@@ -230,7 +230,7 @@ button {
 .timerStrip {
   min-height: 62px;
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(145px, 170px) minmax(180px, 220px) minmax(160px, 210px) minmax(220px, 1fr) 60px 56px 116px auto 32px;
+  grid-template-columns: minmax(180px, 1fr) minmax(145px, 170px) minmax(180px, 220px) minmax(160px, 210px) minmax(220px, 1fr) 116px auto 32px;
   align-items: center;
   gap: 0;
   background: var(--panel);
@@ -289,15 +289,6 @@ button {
 .currentProject b,
 .entryProject b {
   color: var(--muted);
-}
-
-.iconCell {
-  height: 50px;
-  border-left: 1px dotted #bdc8cf;
-}
-
-.money {
-  color: #03a9f4;
 }
 
 .timerValue {
@@ -2259,10 +2250,6 @@ button {
   }
 
   .currentProject {
-    display: none;
-  }
-
-  .iconCell {
     display: none;
   }
 
