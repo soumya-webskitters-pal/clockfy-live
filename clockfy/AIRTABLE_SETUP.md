@@ -36,6 +36,9 @@ Fields:
 - `Project ID`
 - `Project Name`
 - `Project Color`
+- `Client ID`
+- `Client Name`
+- `Subtask`
 - `Start Time`
 - `End Time`
 - `Duration`

@@ -11,7 +11,8 @@ function filterEntries(entries, search, filter, customDate) {
   const month = today.slice(0, 7);
   return entries.filter((entry) => {
     const q = search.trim().toLowerCase();
-    const matches = !q || entry.projectName.toLowerCase().includes(q) || entry.date.includes(q) || entry.notes.toLowerCase().includes(q);
+    const matches = !q || [entry.projectName, entry.clientName, entry.subtask, entry.date, entry.notes]
+      .some((value) => String(value || '').toLowerCase().includes(q));
     const inFilter =
       filter === 'all' ||
       (filter === 'today' && entry.date === today) ||
@@ -114,7 +115,13 @@ export default function HistoryTable() {
                       ) : (
                         <button className="description" disabled={!canEditTime} onClick={() => startEdit(entry)}>{entry.notes || 'Add description'}</button>
                       )}
-                      <span className="entryProject"><i style={{ background: entry.projectColor }} />{entry.projectName} <b>- {entry.userName}</b></span>
+                      <span className="entryProject">
+                        <i style={{ background: entry.projectColor }} />
+                        {entry.clientName && <em>{entry.clientName}</em>}
+                        {entry.projectName}
+                        {entry.subtask && <small>{entry.subtask}</small>}
+                        <b>- {entry.userName}</b>
+                      </span>
                       <span className="entryIcon"><Tag size={20} /></span>
                       <span className="entryMoney"><CircleDollarSign size={22} /></span>
                       {editing === entry.id ? (

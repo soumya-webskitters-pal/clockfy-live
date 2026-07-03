@@ -230,7 +230,7 @@ button {
 .timerStrip {
   min-height: 62px;
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) 250px minmax(280px, 1.1fr) 60px 56px 116px auto auto 32px;
+  grid-template-columns: minmax(180px, 1fr) minmax(145px, 170px) minmax(180px, 220px) minmax(160px, 210px) minmax(220px, 1fr) 60px 56px 116px auto 32px;
   align-items: center;
   gap: 0;
   background: var(--panel);
@@ -917,6 +917,11 @@ button {
   margin-left: auto;
 }
 
+.projectName:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
 .filled {
   fill: currentColor;
   color: #f5b301;
@@ -1234,6 +1239,22 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.entryProject em,
+.entryProject small {
+  min-width: 0;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.entryProject em {
+  color: #5264d8;
 }
 
 .entryIcon,
@@ -2234,7 +2255,7 @@ button {
 
 @media (max-width: 1500px) {
   .timerStrip {
-    grid-template-columns: 1fr 220px 90px auto auto 30px;
+    grid-template-columns: minmax(160px, 1fr) minmax(135px, 160px) minmax(170px, 210px) minmax(150px, 190px) 96px auto 30px;
   }
 
   .currentProject {

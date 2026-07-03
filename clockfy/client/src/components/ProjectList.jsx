@@ -20,7 +20,7 @@ const colors = [
 ];
 
 export default function ProjectList() {
-  const { projects, clients, selectedProjectId, setSelectedProjectId, createProject } = useApp();
+  const { projects, clients, selectedProjectId, setSelectedProjectId, createProject, activeTimer } = useApp();
   const [name, setName] = useState('');
   const [clientId, setClientId] = useState('');
   const [subtasks, setSubtasks] = useState([]);
@@ -151,7 +151,7 @@ export default function ProjectList() {
       <div className="projectList">
         {projects.map((project) => (
           <div className={`projectItem taskOnly ${selectedProjectId === project.id ? 'current' : ''}`} key={project.id}>
-            <button className="projectName" onClick={() => setSelectedProjectId(project.id)}>
+            <button className="projectName" onClick={() => setSelectedProjectId(project.id)} disabled={activeTimer?.status === 'running' || activeTimer?.status === 'paused'} title={activeTimer ? 'Stop the timer before changing task' : 'Select task'}>
               <span style={{ background: project.color }} />
               <span className="projectNameText">{project.name}</span>
               {!!project.subtasks?.length && <small>{project.subtasks.length} subtasks</small>}

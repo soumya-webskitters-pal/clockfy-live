@@ -351,6 +351,9 @@ function normalizeEntry(entry) {
     projectId: entry.projectId,
     projectName: entry.projectName || '',
     projectColor: entry.projectColor || '#25baeb',
+    clientId: entry.clientId || '',
+    clientName: entry.clientName || '',
+    subtask: entry.subtask || '',
     startTime,
     endTime,
     duration: Number.isFinite(Number(entry.duration)) ? Number(entry.duration) : durationSeconds(startTime, endTime),
@@ -371,6 +374,9 @@ function entryFromRecord(record) {
     projectId: fields['Project ID'],
     projectName: fields['Project Name'],
     projectColor: fields['Project Color'],
+    clientId: fields['Client ID'],
+    clientName: fields['Client Name'],
+    subtask: fields.Subtask,
     startTime: fields['Start Time'],
     endTime: fields['End Time'],
     duration: fields.Duration,
@@ -390,6 +396,9 @@ function entryToFields(entry) {
     'Project ID': entry.projectId,
     'Project Name': entry.projectName,
     'Project Color': entry.projectColor,
+    'Client ID': entry.clientId,
+    'Client Name': entry.clientName,
+    Subtask: entry.subtask,
     'Start Time': entry.startTime,
     'End Time': entry.endTime || null,
     Duration: entry.duration,
@@ -630,6 +639,10 @@ async function createEntry(payload) {
   const project = projects.find((item) => item.id === payload.projectId);
   if (!user || user.role === 'admin') throw new Error('Valid user is required');
   if (!project) throw new Error('Valid project is required');
+  if (!project.clientId) throw new Error('Client name is required');
+  const subtask = String(payload.subtask || '').trim().replace(/\s+/g, ' ');
+  if (!subtask) throw new Error('Subtask is required');
+  if (!project.subtasks.some((item) => item.toLowerCase() === subtask.toLowerCase())) throw new Error('Valid subtask is required');
   if (!payload.startTime) throw new Error('Start time is required');
   const entry = normalizeEntry({
     ...payload,
@@ -637,6 +650,9 @@ async function createEntry(payload) {
     userName: user.name,
     projectName: project.name,
     projectColor: project.color,
+    clientId: project.clientId,
+    clientName: project.clientName,
+    subtask,
     duration: durationSeconds(payload.startTime, payload.endTime),
     status: payload.endTime ? 'stopped' : 'running',
     updatedAt: new Date().toISOString()
@@ -651,6 +667,8 @@ async function updateEntry(id, payload) {
   if (!entry?.recordId) throw new Error('Entry not found');
   if (payload.actorRole && !timeEditorRoles.has(payload.actorRole)) throw new Error('Only admin or super-user can modify time entries');
   const project = payload.projectId ? (await getProjects()).find((item) => item.id === payload.projectId) : null;
+  const subtask = payload.subtask !== undefined ? String(payload.subtask || '').trim().replace(/\s+/g, ' ') : entry.subtask;
+  if (project && (!subtask || !project.subtasks.some((item) => item.toLowerCase() === subtask.toLowerCase()))) throw new Error('Valid subtask is required');
   const startTime = payload.startTime || entry.startTime;
   const endTime = payload.endTime ?? entry.endTime;
   const next = normalizeEntry({
@@ -658,6 +676,9 @@ async function updateEntry(id, payload) {
     ...payload,
     projectName: project?.name || payload.projectName || entry.projectName,
     projectColor: project?.color || payload.projectColor || entry.projectColor,
+    clientId: project?.clientId || payload.clientId || entry.clientId,
+    clientName: project?.clientName || payload.clientName || entry.clientName,
+    subtask,
     startTime,
     endTime,
     duration: durationSeconds(startTime, endTime),

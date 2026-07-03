@@ -160,6 +160,7 @@ export function AppProvider({ children }) {
       id: `${entry.id}-${Date.now()}`,
       sourceEntryId: entry.id,
       projectId: entry.projectId,
+      subtask: entry.subtask || '',
       notes: entry.notes || ''
     });
     notify('Timer started for same project');
