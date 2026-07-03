@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext.jsx';
 export default function Header() {
   const { darkMode, setDarkMode, currentUser, logout } = useApp();
   const initials = currentUser?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'U';
+  const roleLabel = currentUser?.role === 'admin' ? 'Admin' : currentUser?.role === 'super-user' ? 'Super-user' : 'User';
   return (
     <header className="topbar">
       <div className="brandArea">
@@ -15,7 +16,7 @@ export default function Header() {
       </div>
       <div className="topActions">
         <div className="modeSwitch" aria-label="Current login">
-          <span>{currentUser?.role === 'admin' ? 'Admin' : 'User'}</span>
+          <span>{roleLabel}</span>
           <strong>{currentUser?.name}</strong>
         </div>
         <button aria-label="settings"><Settings size={18} /></button>

@@ -13,7 +13,7 @@ export default function AdminPanel() {
   const [projectId, setProjectId] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const normalUsers = users.filter((user) => user.role === 'user');
+  const normalUsers = users.filter((user) => user.role !== 'admin');
   const filteredEntries = useMemo(() => entries.filter((entry) => {
     const afterStart = !fromDate || entry.date >= fromDate;
     const beforeEnd = !toDate || entry.date <= toDate;

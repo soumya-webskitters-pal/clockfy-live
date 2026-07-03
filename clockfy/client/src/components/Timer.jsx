@@ -5,13 +5,15 @@ import { formatDuration } from '../utils/time.js';
 import Button from './Button.jsx';
 
 export default function Timer() {
-  const { projects, selectedProjectId, setSelectedProjectId, createEntry, timerRequest, activeTimer, timerCommand, setActiveTimer } = useApp();
+  const { projects, selectedProjectId, setSelectedProjectId, createEntry, stopEntry, deleteTimerEntry, timerRequest, activeTimer, timerCommand, setActiveTimer } = useApp();
   const [notes, setNotes] = useState('');
   const [startTime, setStartTime] = useState(null);
+  const [activeEntryId, setActiveEntryId] = useState(null);
   const [pausedSeconds, setPausedSeconds] = useState(0);
   const [pauseStarted, setPauseStarted] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [menuOpen, setMenuOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const selectedProject = useMemo(() => projects.find((project) => project.id === selectedProjectId), [projects, selectedProjectId]);
   const status = !startTime ? 'idle' : pauseStarted ? 'paused' : 'running';
@@ -25,13 +27,16 @@ export default function Timer() {
   useEffect(() => {
     if (!timerRequest) return;
     async function restartTimer() {
-      if (startTime && selectedProject) {
+      if (startTime && selectedProject && activeEntryId) {
         const adjustedEnd = new Date(Date.now() - (pauseStarted ? Date.now() - pauseStarted : 0));
-        await createEntry({ projectId: selectedProject.id, startTime: startTime.toISOString(), endTime: adjustedEnd.toISOString(), notes });
+        await stopEntry(activeEntryId, { endTime: adjustedEnd.toISOString(), notes });
       }
       setSelectedProjectId(timerRequest.projectId);
       setNotes(timerRequest.notes || '');
-      setStartTime(new Date());
+      const nextStart = new Date();
+      const entry = await createEntry({ projectId: timerRequest.projectId, startTime: nextStart.toISOString(), notes: timerRequest.notes || '' });
+      setStartTime(nextStart);
+      setActiveEntryId(entry?.id || null);
       setPausedSeconds(0);
       setPauseStarted(null);
       setActiveTimer({ sourceEntryId: timerRequest.sourceEntryId || null, projectId: timerRequest.projectId, status: 'running' });
@@ -60,7 +65,9 @@ export default function Timer() {
       setMenuOpen(false);
     }
     if (timerCommand.action === 'delete') {
+      if (activeEntryId) deleteTimerEntry(activeEntryId);
       setStartTime(null);
+      setActiveEntryId(null);
       setPauseStarted(null);
       setPausedSeconds(0);
       setNotes('');
@@ -69,12 +76,20 @@ export default function Timer() {
     }
   }, [activeTimer, timerCommand, startTime, pauseStarted, setActiveTimer]);
 
-  function start() {
+  async function start() {
     if (!selectedProject) return;
-    setStartTime(new Date());
-    setPausedSeconds(0);
-    setPauseStarted(null);
-    setActiveTimer({ sourceEntryId: null, projectId: selectedProject.id, status: 'running' });
+    setBusy(true);
+    try {
+      const nextStart = new Date();
+      const entry = await createEntry({ projectId: selectedProject.id, startTime: nextStart.toISOString(), notes });
+      setStartTime(nextStart);
+      setActiveEntryId(entry?.id || null);
+      setPausedSeconds(0);
+      setPauseStarted(null);
+      setActiveTimer({ sourceEntryId: null, projectId: selectedProject.id, status: 'running' });
+    } finally {
+      setBusy(false);
+    }
   }
 
   function pause() {
@@ -90,19 +105,27 @@ export default function Timer() {
   }
 
   async function stop() {
-    if (!startTime || !selectedProject) return;
+    if (!startTime || !selectedProject || !activeEntryId) return;
+    setBusy(true);
     const adjustedEnd = new Date(Date.now() - (pauseStarted ? Date.now() - pauseStarted : 0));
-    await createEntry({ projectId: selectedProject.id, startTime: startTime.toISOString(), endTime: adjustedEnd.toISOString(), notes });
-    setStartTime(null);
-    setPauseStarted(null);
-    setPausedSeconds(0);
-    setNotes('');
-    setActiveTimer(null);
-    setMenuOpen(false);
+    try {
+      await stopEntry(activeEntryId, { endTime: adjustedEnd.toISOString(), notes });
+      setStartTime(null);
+      setActiveEntryId(null);
+      setPauseStarted(null);
+      setPausedSeconds(0);
+      setNotes('');
+      setActiveTimer(null);
+      setMenuOpen(false);
+    } finally {
+      setBusy(false);
+    }
   }
 
-  function deleteTimer() {
+  async function deleteTimer() {
+    if (activeEntryId) await deleteTimerEntry(activeEntryId);
     setStartTime(null);
+    setActiveEntryId(null);
     setPauseStarted(null);
     setPausedSeconds(0);
     setNotes('');
@@ -113,15 +136,15 @@ export default function Timer() {
   return (
     <section className="timerStrip">
       <input className="taskInput" value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="What are you working on?" />
-      <select className="projectSelect" value={selectedProjectId} onChange={(event) => setSelectedProjectId(event.target.value)}>
+      <select className="projectSelect" value={selectedProjectId} onChange={(event) => setSelectedProjectId(event.target.value)} disabled={status !== 'idle'} title={status !== 'idle' ? 'Stop the timer before changing task' : 'Select task'}>
         {projects.map((project) => <option value={project.id} key={project.id}>{project.name}</option>)}
       </select>
       <span className="currentProject"><i style={{ background: selectedProject?.color || '#009688' }} />{selectedProject?.name || 'Select project'} <b>- Vishal - Vish UK</b></span>
       <button className="iconCell" title="Tag"><Tag size={20} /></button>
       <button className="iconCell money" title="Billable"><CircleDollarSign size={23} /></button>
       <strong className="timerValue">{formatDuration(elapsed)}</strong>
-      {status === 'idle' && <Button className="startBtn" onClick={start}><Play size={16} /> Start</Button>}
-      {status !== 'idle' && <Button className="stopBtn" onClick={stop}><Square size={14} /> Stop</Button>}
+      {status === 'idle' && <Button className="startBtn" onClick={start} disabled={busy}><Play size={16} /> Start</Button>}
+      {status !== 'idle' && <Button className="stopBtn" onClick={stop} disabled={busy}><Square size={14} /> Stop</Button>}
       <div className="timerMenuWrap">
         <button className="kebab" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label="Timer actions"><MoreVertical size={21} /></button>
         {menuOpen && (

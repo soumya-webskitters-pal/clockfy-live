@@ -198,11 +198,19 @@ button {
 
 .sidebar button {
   width: 100%;
-  height: 51px;
+  min-height: 70px;
   display: grid;
   place-items: center;
+  gap: 5px;
   color: #31424d;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
   transition: background .18s ease, color .18s ease;
+}
+
+.sidebar button span {
+  line-height: 1;
 }
 
 .sidebar button:hover,
@@ -211,19 +219,12 @@ button {
   color: #0ea5d5;
 }
 
-.sidebar .collapse {
-  position: absolute;
-  top: 352px;
-  right: -10px;
-  width: 22px;
-  height: 22px;
-  background: white;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+.main {
+  padding: 90px 20px 48px;
 }
 
-.main {
-  padding: 90px 20px 48px 84px;
+.main.hasSidebar {
+  padding-left: 84px;
 }
 
 .timerStrip {
@@ -257,6 +258,12 @@ button {
   border-left: 1px dotted #bdc8cf;
   color: #009688;
   font-weight: 700;
+}
+
+.projectSelect:disabled {
+  cursor: not-allowed;
+  color: var(--muted);
+  opacity: 1;
 }
 
 .currentProject {
@@ -422,6 +429,8 @@ button {
 .metric,
 .chartPanel,
 .adminPanel,
+.analyticsPanel,
+.analyticsCard,
 .emptyState,
 .skeleton {
   background: var(--panel);
@@ -434,7 +443,7 @@ button {
   top: 88px;
   align-self: start;
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
 }
 
 .adminSideRail {
@@ -451,7 +460,7 @@ button {
 
 .adminCreateUserPanel {
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
 }
 
 .adminCreateUserPanel .panelTitle svg {
@@ -460,8 +469,10 @@ button {
 
 .sideCreateUserForm {
   display: grid;
-  gap: 12px;
-  margin-top: 18px;
+  grid-template-columns: minmax(240px, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .sideCreateUserForm label {
@@ -474,7 +485,7 @@ button {
 }
 
 .sideCreateUserForm input {
-  min-height: 40px;
+  min-height: 36px;
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -484,7 +495,7 @@ button {
 }
 
 .sideCreateUserForm button {
-  min-height: 40px;
+  min-height: 36px;
   border: 0;
   border-radius: 6px;
   padding: 0 18px;
@@ -494,6 +505,7 @@ button {
 }
 
 .sideCreateUserForm em {
+  grid-column: 1 / -1;
   color: #027a48;
   font-style: normal;
   font-size: 13px;
@@ -520,8 +532,8 @@ button {
 
 .projectForm {
   display: grid;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .input,
@@ -547,31 +559,101 @@ button {
   box-shadow: 0 0 0 3px rgba(37, 186, 235, 0.12);
 }
 
-.swatches {
-  display: flex;
+.colorDropdown {
+  position: relative;
+}
+
+.colorDropdownButton {
+  min-height: 38px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 16px;
+  align-items: center;
   gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--panel);
+  color: var(--text);
+  text-align: left;
+  font-weight: 850;
 }
 
-.swatches button {
-  width: 24px;
-  height: 24px;
-  border: 2px solid transparent;
-  border-radius: 50%;
-  background: var(--swatch);
+.colorDropdownButton span {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  background: var(--selected-color);
 }
 
-.swatches .picked {
-  border-color: #111;
+.colorDropdownButton b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.colorDropdownButton svg {
+  color: var(--muted);
+  transition: transform .18s ease;
+}
+
+.colorDropdownButton[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.colorDropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 2px;
+  max-height: 250px;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.colorDropdownMenu button {
+  min-height: 34px;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 8px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-weight: 800;
+}
+
+.colorDropdownMenu button:hover,
+.colorDropdownMenu .selected {
+  background: var(--panel-soft);
+}
+
+.colorDropdownMenu i {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  background: var(--option-color);
 }
 
 .projectList {
-  margin-top: 18px;
+  margin-top: 14px;
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .projectItem {
-  min-height: 42px;
+  min-height: 38px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 26px 26px 26px 26px;
   align-items: center;
@@ -620,6 +702,35 @@ button {
   min-width: 0;
   display: grid;
   gap: 18px;
+}
+
+.singlePanelPage {
+  display: grid;
+  gap: 14px;
+}
+
+.singlePanelPage:not(.userAdminPage) {
+  max-width: none;
+}
+
+.singlePanelPage .projectPanel {
+  position: static;
+  width: 100%;
+}
+
+.singlePanelPage .projectForm {
+  grid-template-columns: minmax(240px, 1fr) minmax(140px, 180px) auto;
+  align-items: center;
+}
+
+.singlePanelPage .projectForm .button {
+  min-width: 104px;
+}
+
+.userAdminPage {
+  max-width: none;
+  grid-template-columns: 1fr;
+  align-items: stretch;
 }
 
 .dashboardGrid {
@@ -1053,6 +1164,400 @@ button {
   overflow: hidden;
 }
 
+.teamReviewPanel {
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel);
+}
+
+.teamReviewHead {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.13), rgba(37, 186, 235, 0.1));
+  border-bottom: 1px solid var(--border);
+}
+
+.teamReviewHead span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #047857;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.teamReviewHead h2 {
+  margin: 5px 0 0;
+  font-size: 20px;
+}
+
+.teamReviewActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.teamReviewActions button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 0 13px;
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 900;
+}
+
+.teamReviewActions strong {
+  font-size: 24px;
+}
+
+.teamReviewFilters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.teamReviewFilters label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.teamReviewFilters select,
+.teamReviewFilters input {
+  min-height: 36px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.teamReviewSearch span {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--panel-soft);
+}
+
+.teamReviewSearch input {
+  min-height: 34px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.teamReviewTable {
+  display: grid;
+}
+
+.teamReviewTableHead,
+.teamReviewRow {
+  display: grid;
+  grid-template-columns: 150px minmax(220px, 1fr) 120px 170px 120px;
+  align-items: center;
+  gap: 16px;
+  min-height: 42px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.teamReviewTableHead {
+  color: var(--muted);
+  background: var(--panel-soft);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.teamReviewRow span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.teamReviewRow span:nth-child(2) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teamReviewRow i {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 999px;
+}
+
+.teamReviewEmpty {
+  padding: 22px;
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.analyticsPanel {
+  display: grid;
+  gap: 14px;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.analyticsHead {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(82, 100, 216, 0.13), rgba(37, 186, 235, 0.1));
+  border: 1px solid var(--border);
+}
+
+.analyticsHead span,
+.analyticsCardHead span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4352b8;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.analyticsHead h2 {
+  margin: 5px 0 0;
+  font-size: 20px;
+}
+
+.analyticsHead strong {
+  font-size: 24px;
+}
+
+.analyticsMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.analyticsMetrics article {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 13px;
+  background: var(--panel-soft);
+}
+
+.analyticsMetrics svg {
+  color: #5264d8;
+}
+
+.analyticsMetrics span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.analyticsMetrics strong {
+  grid-column: 2;
+  font-size: 20px;
+}
+
+.analyticsFilters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.analyticsFilters label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.analyticsFilters select,
+.analyticsFilters input {
+  min-height: 36px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.analyticsCard {
+  display: grid;
+  gap: 12px;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.analyticsCard.wide {
+  grid-column: 1 / -1;
+}
+
+.analyticsCardHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.analyticsCardHead strong {
+  font-size: 14px;
+}
+
+.analyticsChart {
+  height: 250px;
+  display: grid;
+  place-items: center;
+}
+
+.analyticsChart.pie {
+  height: 230px;
+}
+
+.analyticsChart.trend {
+  height: 270px;
+}
+
+.analyticsChart canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.analyticsChart em {
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 850;
+}
+
+.projectTotalsTable {
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.projectTotalsTable div {
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 130px;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.projectTotalsTable div:last-of-type {
+  border-bottom: 0;
+}
+
+.projectTotalsTable span {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 850;
+}
+
+.projectTotalsTable i {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
+  border-radius: 999px;
+}
+
+.projectTotalsTable small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.projectTotalsTable strong {
+  justify-self: end;
+}
+
+.projectTotalsTable em {
+  padding: 16px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 850;
+}
+
+.analyticsLegend,
+.analyticsList {
+  display: grid;
+  gap: 8px;
+}
+
+.analyticsLegend span,
+.analyticsList span {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.analyticsList span {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.analyticsLegend i {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+}
+
+.analyticsLegend b,
+.analyticsList b {
+  color: var(--text);
+  font-size: 12px;
+}
+
 .adminPanelHead {
   min-height: 102px;
   display: flex;
@@ -1207,9 +1712,9 @@ button {
 
 .adminCredentials {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   border-radius: 8px;
-  padding: 18px;
+  padding: 16px;
   background: var(--panel);
 }
 
@@ -1273,9 +1778,9 @@ button {
   grid-template-columns: minmax(0, 1fr) auto 17px;
   align-items: center;
   gap: 8px;
-  min-height: 48px;
+  min-height: 42px;
   border: 0;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background: var(--panel);
   color: var(--text);
   text-align: left;
@@ -1313,7 +1818,9 @@ button {
 
 .credentialAccordionBody {
   display: grid;
-  gap: 10px;
+  grid-template-columns: minmax(240px, 1fr) minmax(150px, 200px) auto;
+  align-items: end;
+  gap: 9px;
   padding: 0 12px 12px;
 }
 
@@ -1326,8 +1833,9 @@ button {
   text-transform: uppercase;
 }
 
-.credentialAccordionBody input {
-  min-height: 36px;
+.credentialAccordionBody input,
+.credentialAccordionBody select {
+  min-height: 34px;
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0 10px;
@@ -1343,8 +1851,8 @@ button {
 }
 
 .credentialActions button {
-  flex: 1;
-  min-height: 36px;
+  min-width: 86px;
+  min-height: 34px;
   border: 0;
   border-radius: 6px;
   padding: 0 14px;
@@ -1568,12 +2076,12 @@ button {
     height: 58px;
   }
 
-  .sidebar .collapse {
-    display: none;
-  }
-
   .main {
     padding: 74px 12px 78px;
+  }
+
+  .main.hasSidebar {
+    padding-left: 12px;
   }
 
   .timerStrip {
@@ -1598,6 +2106,38 @@ button {
   .toolRow {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .userAdminPage {
+    grid-template-columns: 1fr;
+  }
+
+  .analyticsMetrics,
+  .analyticsFilters,
+  .analyticsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectTotalsTable div {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 12px 14px;
+  }
+
+  .projectTotalsTable strong {
+    justify-self: start;
+  }
+
+  .singlePanelPage .projectForm {
+    grid-template-columns: 1fr;
+  }
+
+  .sideCreateUserForm {
+    grid-template-columns: 1fr;
+  }
+
+  .credentialAccordionBody {
+    grid-template-columns: 1fr;
   }
 
   .searchBar {
@@ -1654,6 +2194,10 @@ button {
   }
 
   .adminPanelHead,
+  .teamReviewHead,
+  .teamReviewFilters,
+  .teamReviewTableHead,
+  .teamReviewRow,
   .adminFilters,
   .adminWorkloadChart,
   .adminTableHead,
@@ -1665,6 +2209,17 @@ button {
 
   .adminPanelHead {
     align-items: start;
+  }
+
+  .teamReviewHead {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .analyticsHead,
+  .analyticsCardHead {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .adminCredentialsHead {
@@ -1682,12 +2237,18 @@ button {
   }
 
   .adminTableHead,
+  .teamReviewTableHead,
   .credentialTableHead {
     display: none;
   }
 
+  .teamReviewRow,
   .adminTableRow {
     gap: 6px;
     padding: 14px 18px;
+  }
+
+  .teamReviewRow span {
+    white-space: normal;
   }
 }

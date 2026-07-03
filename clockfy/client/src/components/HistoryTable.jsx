@@ -29,9 +29,9 @@ export default function HistoryTable() {
   const [draft, setDraft] = useState({});
   const [collapsedGroups, setCollapsedGroups] = useState({});
   const [openRowMenu, setOpenRowMenu] = useState(null);
-  const isAdmin = mode === 'admin';
+  const canEditTime = ['admin', 'super-user'].includes(mode);
   const scopedEntries = useMemo(() => (
-    currentUser?.role === 'user' ? entries.filter((entry) => entry.userId === currentUser.id) : entries
+    currentUser?.role === 'admin' ? entries : entries.filter((entry) => entry.userId === currentUser.id)
   ), [entries, currentUser]);
   const filtered = useMemo(() => filterEntries(scopedEntries, search, filter, customDate), [scopedEntries, search, filter, customDate]);
   const groups = useMemo(() => {
@@ -47,7 +47,7 @@ export default function HistoryTable() {
   }, [filtered]);
 
   function startEdit(entry) {
-    if (!isAdmin) return;
+    if (!canEditTime) return;
     setEditing(entry.id);
     setDraft({ notes: entry.notes, startTime: localInputValue(entry.startTime), endTime: localInputValue(entry.endTime) });
   }
@@ -87,7 +87,7 @@ export default function HistoryTable() {
                 return map;
               }, new Map()).entries()].map(([projectKey, projectRows]) => {
                 const accordionKey = `${day}-${projectKey}`;
-                const canCollapse = !isAdmin && projectRows.length > 1;
+                const canCollapse = !canEditTime && projectRows.length > 1;
                 const isCollapsed = canCollapse && collapsedGroups[accordionKey] !== false;
                 const visibleRows = isCollapsed ? [] : projectRows;
                 return (
@@ -107,12 +107,12 @@ export default function HistoryTable() {
                     </span>
                   </button>
                   {visibleRows.map((entry, index) => (
-                    <div className={`entryRow ${!isAdmin ? 'userLocked' : ''}`} key={entry.id}>
+                    <div className={`entryRow ${!canEditTime ? 'userLocked' : ''}`} key={entry.id}>
                       <span className="badge">{index % 2 === 0 ? '2' : ''}</span>
                       {editing === entry.id ? (
                         <input className="notesEdit" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
                       ) : (
-                        <button className="description" disabled={!isAdmin} onClick={() => startEdit(entry)}>{entry.notes || 'Add description'}</button>
+                        <button className="description" disabled={!canEditTime} onClick={() => startEdit(entry)}>{entry.notes || 'Add description'}</button>
                       )}
                       <span className="entryProject"><i style={{ background: entry.projectColor }} />{entry.projectName} <b>- {entry.userName}</b></span>
                       <span className="entryIcon"><Tag size={20} /></span>
@@ -127,13 +127,13 @@ export default function HistoryTable() {
                       )}
                       <span className="entryIcon"><CalendarDays size={20} /></span>
                       <strong className="duration">{formatDuration(entry.duration)}</strong>
-                      {isAdmin ? (
+                      {canEditTime ? (
                         editing === entry.id ? <button className="rowAction" onClick={() => save(entry)}><Save size={18} /></button> : <button className="rowAction" title="Edit time entry" onClick={() => startEdit(entry)}><Pencil size={17} /></button>
                       ) : (
                         <button className="rowAction" title="Start timer for same project" onClick={() => startTimerFromEntry(entry)}><Play size={18} /></button>
                       )}
-                      {isAdmin && <button className="rowAction danger" onClick={() => confirm('Delete entry?') && deleteEntry(entry.id)}><Trash2 size={17} /></button>}
-                      {isAdmin ? (
+                      {canEditTime && <button className="rowAction danger" onClick={() => confirm('Delete entry?') && deleteEntry(entry.id)}><Trash2 size={17} /></button>}
+                      {canEditTime ? (
                         <MoreVertical className="more" size={20} />
                       ) : (
                         <div className="rowMenuWrap">

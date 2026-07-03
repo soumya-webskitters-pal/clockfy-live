@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useApp } from '../context/AppContext.jsx';
 
 export default function AdminCredentialsPanel() {
-  const { users, updateUserPassword, deleteUser } = useApp();
+  const { users, updateUserPassword, updateUserRole, deleteUser } = useApp();
   const [passwordEdits, setPasswordEdits] = useState({});
   const [panelError, setPanelError] = useState('');
-  const [openUsers, setOpenUsers] = useState({});
-  const normalUsers = users.filter((user) => user.role === 'user');
+  const [openUserId, setOpenUserId] = useState('');
+  const normalUsers = users.filter((user) => user.role !== 'admin');
 
   async function savePassword(user) {
     setPanelError('');
@@ -18,6 +18,15 @@ export default function AdminCredentialsPanel() {
         delete next[user.id];
         return next;
       });
+    } catch (error) {
+      setPanelError(error.message);
+    }
+  }
+
+  async function saveRole(user, role) {
+    setPanelError('');
+    try {
+      await updateUserRole(user.id, role);
     } catch (error) {
       setPanelError(error.message);
     }
@@ -46,13 +55,13 @@ export default function AdminCredentialsPanel() {
       </div>
       <div className="credentialTable">
         {normalUsers.map((user) => {
-          const isOpen = Boolean(openUsers[user.id]);
+          const isOpen = openUserId === user.id;
           return (
           <div className={`credentialTableRow ${isOpen ? 'open' : ''}`} key={user.id}>
             <button
               className="credentialAccordionButton"
               type="button"
-              onClick={() => setOpenUsers((current) => ({ ...current, [user.id]: !current[user.id] }))}
+              onClick={() => setOpenUserId((current) => current === user.id ? '' : user.id)}
               aria-expanded={isOpen}
             >
               <span>{user.name}</span>
@@ -67,6 +76,13 @@ export default function AdminCredentialsPanel() {
                     value={passwordEdits[user.id] ?? user.password ?? ''}
                     onChange={(event) => setPasswordEdits({ ...passwordEdits, [user.id]: event.target.value })}
                   />
+                </label>
+                <label>
+                  Mode
+                  <select value={user.role || 'user'} onChange={(event) => saveRole(user, event.target.value)}>
+                    <option value="user">User</option>
+                    <option value="super-user">Super-user</option>
+                  </select>
                 </label>
                 <div className="credentialActions">
                   <button type="button" onClick={() => savePassword(user)}>Save</button>

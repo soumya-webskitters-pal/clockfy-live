@@ -4,7 +4,7 @@ import { formatDuration } from '../utils/time.js';
 
 export default function DashboardCards() {
   const { dashboard, entries, currentUser } = useApp();
-  const visibleEntries = currentUser?.role === 'user' ? entries.filter((entry) => entry.userId === currentUser.id) : entries;
+  const visibleEntries = currentUser?.role === 'admin' ? entries : entries.filter((entry) => entry.userId === currentUser.id);
   const today = new Date().toISOString().slice(0, 10);
   const weekStart = new Date();
   const day = weekStart.getDay();
@@ -12,7 +12,7 @@ export default function DashboardCards() {
   weekStart.setHours(0, 0, 0, 0);
   const month = today.slice(0, 7);
   const sum = (items) => items.reduce((total, entry) => total + Number(entry.duration || 0), 0);
-  const totals = currentUser?.role === 'user' ? {
+  const totals = currentUser?.role !== 'admin' ? {
     todayTotal: sum(visibleEntries.filter((entry) => entry.date === today)),
     weekTotal: sum(visibleEntries.filter((entry) => new Date(entry.startTime) >= weekStart)),
     monthTotal: sum(visibleEntries.filter((entry) => entry.date.startsWith(month))),

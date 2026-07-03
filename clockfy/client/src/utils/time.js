@@ -11,6 +11,7 @@ export function toDateKey(value = new Date()) {
 }
 
 export function formatClock(value) {
+  if (!value) return 'Running';
   return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
@@ -34,6 +35,7 @@ export function getWeekBucket(dateKey) {
 }
 
 export function localInputValue(iso) {
+  if (!iso) return '';
   const d = new Date(iso);
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
   return d.toISOString().slice(0, 16);

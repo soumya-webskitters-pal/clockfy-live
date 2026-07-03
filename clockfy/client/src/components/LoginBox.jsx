@@ -8,7 +8,7 @@ export default function LoginBox() {
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const admins = users.filter((user) => user.role === 'admin');
-  const team = users.filter((user) => user.role === 'user');
+  const team = users.filter((user) => user.role !== 'admin');
 
   async function submit(event) {
     event.preventDefault();
@@ -28,7 +28,7 @@ export default function LoginBox() {
           <strong>clockify</strong>
         </div>
         <h1>Workspace login</h1>
-        <p>Admin creates tasks and users. Users track time against assigned tasks.</p>
+        <p>Admin creates users. Users track time, and super-users can manage tasks and time.</p>
         <form className="loginForm" onSubmit={submit}>
           <label>Login ID<input value={loginId} onChange={(event) => setLoginId(event.target.value)} /></label>
           <label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>

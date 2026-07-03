@@ -3,6 +3,7 @@ import { api } from '../services/api.js';
 import { toDateKey } from '../utils/time.js';
 
 const AppContext = createContext(null);
+const timeEditorRoles = new Set(['admin', 'super-user']);
 
 export function AppProvider({ children }) {
   const [projects, setProjects] = useState([]);
@@ -18,6 +19,7 @@ export function AppProvider({ children }) {
   const [darkMode, setDarkMode] = useState(false);
   const [mode, setMode] = useState('user');
   const [currentUser, setCurrentUser] = useState(null);
+  const [activePage, setActivePage] = useState('home');
   const [timerRequest, setTimerRequest] = useState(null);
   const [activeTimer, setActiveTimer] = useState(null);
   const [timerCommand, setTimerCommand] = useState(null);
@@ -28,7 +30,8 @@ export function AppProvider({ children }) {
   }, []);
 
   const refresh = useCallback(async () => {
-    const [userData, projectData, entryData, dashboardData] = await Promise.all([api.getUsers(), api.getProjects(), api.getEntries(), api.getDashboard()]);
+    const [userData, projectData, entryData] = await Promise.all([api.getUsers(), api.getProjects(), api.getEntries()]);
+    const dashboardData = await api.getDashboard();
     setUsers(userData);
     setProjects(projectData);
     setEntries(entryData);
@@ -41,6 +44,10 @@ export function AppProvider({ children }) {
   }, [notify, refresh]);
 
   const createProject = async (payload) => {
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can add tasks');
+      return;
+    }
     const project = await api.createProject(payload);
     await refresh();
     setSelectedProjectId(project.id);
@@ -48,30 +55,51 @@ export function AppProvider({ children }) {
   };
 
   const updateProject = async (id, payload) => {
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can update tasks');
+      return;
+    }
     await api.updateProject(id, payload);
     await refresh();
     notify('Project updated');
   };
 
   const deleteProject = async (id) => {
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can delete tasks');
+      return;
+    }
     await api.deleteProject(id);
     await refresh();
     notify('Project deleted');
   };
 
   const createEntry = async (payload) => {
-    if (!currentUser || currentUser.role !== 'user') {
+    if (!currentUser || currentUser.role === 'admin') {
       notify('Choose a user before tracking time');
       return;
     }
-    await api.createEntry({ ...payload, userId: currentUser.id });
+    const entry = await api.createEntry({ ...payload, userId: currentUser.id });
+    await refresh();
+    notify(payload.endTime ? 'Time saved' : 'Timer started');
+    return entry;
+  };
+
+  const stopEntry = async (id, payload) => {
+    await api.updateEntry(id, payload);
     await refresh();
     notify('Time saved');
   };
 
+  const deleteTimerEntry = async (id) => {
+    await api.deleteEntry(id, 'timer');
+    await refresh();
+    notify('Timer discarded');
+  };
+
   const updateEntry = async (id, payload) => {
-    if (currentUser?.role !== 'admin') {
-      notify('Only admin can modify time');
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can modify time');
       return;
     }
     await api.updateEntry(id, { ...payload, actorRole: currentUser.role });
@@ -80,8 +108,8 @@ export function AppProvider({ children }) {
   };
 
   const deleteEntry = async (id) => {
-    if (currentUser?.role !== 'admin') {
-      notify('Only admin can delete time');
+    if (!timeEditorRoles.has(currentUser?.role)) {
+      notify('Only admin or super-user can delete time');
       return;
     }
     await api.deleteEntry(id, currentUser.role);
@@ -90,7 +118,7 @@ export function AppProvider({ children }) {
   };
 
   const startTimerFromEntry = (entry) => {
-    setMode('user');
+    setMode(currentUser?.role === 'super-user' ? 'super-user' : 'user');
     if (currentUser?.role === 'admin') {
       notify('Login as a user to track time');
       return;
@@ -125,10 +153,15 @@ export function AppProvider({ children }) {
     const user = await api.login(credentials);
     setCurrentUser(user);
     setMode(user.role);
+    setActivePage('home');
     notify(`Logged in as ${user.name}`);
   };
 
   const createUser = async (payload) => {
+    if (currentUser?.role !== 'admin') {
+      notify('Only admin can create users');
+      return null;
+    }
     const result = await api.createUser(payload);
     await refresh();
     notify(`User created: ${result.credential.loginId}`);
@@ -136,12 +169,30 @@ export function AppProvider({ children }) {
   };
 
   const updateUserPassword = async (id, password) => {
+    if (currentUser?.role !== 'admin') {
+      notify('Only admin can update user passwords');
+      return;
+    }
     await api.updateUserPassword(id, { password });
     await refresh();
     notify('Password updated');
   };
 
+  const updateUserRole = async (id, role) => {
+    if (currentUser?.role !== 'admin') {
+      notify('Only admin can change user mode');
+      return;
+    }
+    await api.updateUserRole(id, { role });
+    await refresh();
+    notify('User mode updated');
+  };
+
   const deleteUser = async (id) => {
+    if (currentUser?.role !== 'admin') {
+      notify('Only admin can remove users');
+      return;
+    }
     await api.deleteUser(id);
     await refresh();
     notify('User removed');
@@ -150,6 +201,7 @@ export function AppProvider({ children }) {
   const logout = () => {
     setCurrentUser(null);
     setMode('user');
+    setActivePage('home');
     setTimerRequest(null);
   };
 
@@ -179,6 +231,7 @@ export function AppProvider({ children }) {
     currentUser,
     createUser,
     updateUserPassword,
+    updateUserRole,
     deleteUser,
     login,
     logout,
@@ -197,6 +250,8 @@ export function AppProvider({ children }) {
     setDarkMode,
     mode,
     setMode,
+    activePage,
+    setActivePage,
     timerRequest,
     activeTimer,
     setActiveTimer,
@@ -205,6 +260,8 @@ export function AppProvider({ children }) {
     updateProject,
     deleteProject,
     createEntry,
+    stopEntry,
+    deleteTimerEntry,
     updateEntry,
     deleteEntry,
     startTimerFromEntry,
@@ -212,7 +269,7 @@ export function AppProvider({ children }) {
     deleteTargetTimer,
     exportData,
     importData
-  }), [projects, users, entries, dashboard, currentUser, selectedProjectId, search, filter, customDate, loading, toast, darkMode, mode, timerRequest, activeTimer, timerCommand]);
+  }), [projects, users, entries, dashboard, currentUser, selectedProjectId, search, filter, customDate, loading, toast, darkMode, mode, activePage, timerRequest, activeTimer, timerCommand]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
