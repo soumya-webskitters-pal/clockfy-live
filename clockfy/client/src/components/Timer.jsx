@@ -189,7 +189,9 @@ export default function Timer() {
         <option value="">Select subtask</option>
         {selectedProject?.subtasks.map((subtask) => <option value={subtask} key={subtask}>{subtask}</option>)}
       </select>
-      <span className="currentProject"><i style={{ background: selectedProject?.color || '#009688' }} />{selectedProject?.clientName || 'Client'} / {selectedProject?.name || 'Project'} {selectedSubtask && <b>- {selectedSubtask}</b>}</span>
+      {selectedProject && (
+        <span className="currentProject"><i style={{ background: selectedProject.color || '#009688' }} />{selectedProject.clientName} / {selectedProject.name} {selectedSubtask && <b>- {selectedSubtask}</b>}</span>
+      )}
       <strong className="timerValue">{formatDuration(elapsed)}</strong>
       {status === 'idle' && <Button className="startBtn" onClick={start} disabled={busy || !canStart}><Play size={16} /> Start</Button>}
       {status !== 'idle' && <Button className="stopBtn" onClick={stop} disabled={busy}><Square size={14} /> Stop</Button>}

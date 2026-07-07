@@ -187,6 +187,10 @@ export function AppProvider({ children }) {
     setCurrentUser(user);
     setMode(user.role);
     setActivePage('home');
+    setSelectedProjectId('');
+    setTimerRequest(null);
+    setActiveTimer(null);
+    setTimerCommand(null);
     notify(`Logged in as ${user.name}`);
   };
 
@@ -235,7 +239,10 @@ export function AppProvider({ children }) {
     setCurrentUser(null);
     setMode('user');
     setActivePage('home');
+    setSelectedProjectId('');
     setTimerRequest(null);
+    setActiveTimer(null);
+    setTimerCommand(null);
   };
 
   const exportData = async () => {

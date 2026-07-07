@@ -9,6 +9,18 @@
   --primary: #25baeb;
   --accent: #3bf6ea;
   --danger: #f44336;
+  --control-border: #c8d6e0;
+  --control-text: #4f5961;
+  --control-icon: #8ba6b6;
+  --control-divider: #bdc8cf;
+  --active-tab-bg: #dfe7ec;
+  --active-tab-text: #20262b;
+  --control-hover: #edf6fb;
+  --primary-soft: #f8fcff;
+  --sidebar-bg: #f8fbfd;
+  --sidebar-hover: #eaf4f9;
+  --sidebar-text: #31424d;
+  --sidebar-active: #0ea5d5;
   --shadow: 0 10px 28px rgba(26, 56, 76, 0.08);
   color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -37,6 +49,7 @@ button {
 .app {
   min-height: 100vh;
   background: var(--bg);
+  color: var(--text);
 }
 
 .app.dark {
@@ -47,6 +60,18 @@ button {
   --border: #3a4a54;
   --muted: #a7b3ba;
   --text: #eef6f9;
+  --control-border: #4a5d68;
+  --control-text: #d9e6ec;
+  --control-icon: #9fb3be;
+  --control-divider: #4c5e68;
+  --active-tab-bg: #32424b;
+  --active-tab-text: #f4fbfd;
+  --control-hover: #2c3a43;
+  --primary-soft: #203744;
+  --sidebar-bg: #101820;
+  --sidebar-hover: #17242d;
+  --sidebar-text: #b8c8d1;
+  --sidebar-active: #5fd3ff;
   --shadow: 0 12px 26px rgba(0, 0, 0, 0.22);
   color-scheme: dark;
 }
@@ -90,7 +115,7 @@ button {
 .wordmark {
   margin-left: 7px;
   font-size: 23px;
-  color: #111;
+  color: var(--text);
 }
 
 .workspace {
@@ -99,8 +124,8 @@ button {
   align-items: center;
   padding-inline: 22px;
   margin-left: 18px;
-  border-left: 1px dotted #bdc8cf;
-  color: #2d3136;
+  border-left: 1px dotted var(--control-divider);
+  color: var(--text);
 }
 
 .dots {
@@ -122,7 +147,7 @@ button {
 .topActions button {
   width: 58px;
   height: 100%;
-  border-left: 1px dotted #bdc8cf;
+  border-left: 1px dotted var(--control-divider);
 }
 
 .modeSwitch {
@@ -192,7 +217,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f8fbfd;
+  background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
 }
 
@@ -202,7 +227,7 @@ button {
   display: grid;
   place-items: center;
   gap: 5px;
-  color: #31424d;
+  color: var(--sidebar-text);
   font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
@@ -215,8 +240,8 @@ button {
 
 .sidebar button:hover,
 .sidebar .active {
-  background: #eaf4f9;
-  color: #0ea5d5;
+  background: var(--sidebar-hover);
+  color: var(--sidebar-active);
 }
 
 .main {
@@ -255,7 +280,7 @@ button {
 }
 
 .projectSelect {
-  border-left: 1px dotted #bdc8cf;
+  border-left: 1px dotted var(--control-divider);
   color: #009688;
   font-weight: 700;
 }
@@ -1245,7 +1270,7 @@ button {
 }
 
 .entryProject em {
-  color: #5264d8;
+  color: var(--primary);
 }
 
 .entryIcon,
@@ -1257,7 +1282,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-left: 1px dotted #bdc8cf;
+  border-left: 1px dotted var(--control-divider);
 }
 
 .entryIcon {
@@ -1407,6 +1432,14 @@ button {
   background: var(--panel);
 }
 
+.timeReportPanel {
+  display: grid;
+  gap: 12px;
+  padding: 18px 14px;
+  border-radius: 0;
+  background: var(--bg);
+}
+
 .teamReviewHead {
   min-height: 78px;
   display: flex;
@@ -1505,16 +1538,21 @@ button {
 
 .teamReviewTable {
   display: grid;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
 }
 
 .teamReviewTableHead,
 .teamReviewRow {
   display: grid;
-  grid-template-columns: 150px minmax(220px, 1fr) 120px 170px 120px;
+  grid-template-columns: 110px 120px minmax(180px, 1fr) 120px minmax(170px, 1fr) 105px 150px 90px;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  min-width: 1120px;
   min-height: 42px;
-  padding: 0 20px;
+  padding: 0 14px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -1533,7 +1571,7 @@ button {
   white-space: nowrap;
 }
 
-.teamReviewRow span:nth-child(2) {
+.teamReviewRow span:nth-child(3) {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1552,11 +1590,169 @@ button {
   font-weight: 850;
 }
 
+.teamReviewSummary {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--border);
+  padding: 0 16px;
+  background: var(--panel);
+}
+
+.teamReviewSummary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.teamReviewSummary strong {
+  font-size: 22px;
+}
+
 .analyticsPanel {
   display: grid;
-  gap: 14px;
-  border-radius: 8px;
-  padding: 16px;
+  gap: 12px;
+  border-radius: 0;
+  padding: 18px 14px;
+  background: var(--bg);
+}
+
+.reportToolbar {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.reportTabs,
+.reportActions {
+  display: flex;
+  align-items: stretch;
+}
+
+.reportTabs button,
+.reportDatePicker,
+.reportStepButton,
+.reportExportButton {
+  min-height: 40px;
+  border: 1px solid var(--control-border);
+  border-left: 0;
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--control-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.reportTabs button {
+  padding: 0 12px;
+}
+
+.reportTabs button:first-child,
+.reportDatePicker {
+  border-left: 1px solid var(--control-border);
+}
+
+.reportTabs button.active {
+  background: var(--active-tab-bg);
+  color: var(--active-tab-text);
+}
+
+.reportMenu,
+.reportExportButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+}
+
+.reportDateWrap {
+  position: relative;
+  display: flex;
+}
+
+.reportDatePicker {
+  min-width: 230px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.reportDatePicker svg {
+  color: var(--control-icon);
+}
+
+.reportDatePicker span {
+  flex: 1;
+  text-align: left;
+}
+
+.reportDateMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  width: 230px;
+  display: grid;
+  border: 1px solid var(--control-border);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.reportDateMenu button {
+  min-height: 36px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  background: transparent;
+  color: var(--control-text);
+  text-align: left;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.reportDateMenu button:last-child {
+  border-bottom: 0;
+}
+
+.reportDateMenu button:hover,
+.reportDateMenu button.active {
+  background: var(--control-hover);
+  color: var(--primary);
+}
+
+.reportStepButton {
+  width: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--control-icon);
+}
+
+.reportExportButton {
+  margin-left: 10px;
+  border-left: 1px solid #008bd2;
+  border-color: #008bd2;
+  padding: 0 20px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.reportActions > button:not(.reportStepButton):not(.reportExportButton):not(.reportDatePicker) {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--control-border);
+  padding: 0 12px;
+  background: var(--panel);
+  color: var(--control-text);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .analyticsHead {
@@ -1576,7 +1772,7 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #4352b8;
+  color: var(--primary);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -1598,19 +1794,19 @@ button {
 }
 
 .analyticsMetrics article {
-  min-height: 76px;
+  min-height: 68px;
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
   align-items: center;
   column-gap: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 13px;
-  background: var(--panel-soft);
+  background: var(--panel);
 }
 
 .analyticsMetrics svg {
-  color: #5264d8;
+  color: var(--primary);
 }
 
 .analyticsMetrics span {
@@ -1627,32 +1823,197 @@ button {
 
 .analyticsFilters {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  padding: 14px;
+  grid-template-columns: 96px repeat(5, minmax(96px, 1fr)) minmax(170px, 1.25fr) 126px 92px;
+  gap: 0;
+  padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--panel-soft);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--text);
 }
 
 .analyticsFilters label {
   display: grid;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
+  align-items: center;
+  position: relative;
+  min-height: 40px;
+  border-right: 1px dotted var(--control-divider);
+  color: transparent;
+  font-size: 0;
+  font-weight: 600;
 }
 
 .analyticsFilters select,
 .analyticsFilters input {
-  min-height: 36px;
+  min-height: 40px;
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 0 10px;
+  border: 0;
+  border-radius: 0;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--control-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.searchableSelect {
+  position: relative;
+  min-width: 0;
+  color: var(--control-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.searchableSelectButton {
+  min-height: 40px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14px;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--control-text);
+  text-align: left;
+}
+
+.searchableSelectButton span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchableSelectButton svg {
+  color: var(--control-icon);
+}
+
+.searchableSelectMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: min(260px, 72vw);
+  display: grid;
+  border: 1px solid var(--control-border);
   background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.searchableSelectSearch {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--control-icon);
+}
+
+.analyticsFilters .searchableSelectSearch input {
+  min-height: 38px;
+  border: 0;
+  padding: 0;
+  background: transparent;
   color: var(--text);
+  font-size: 13px;
+}
+
+.searchableSelectOptions {
+  max-height: 220px;
+  overflow-y: auto;
+  display: grid;
+}
+
+.searchableSelectOptions button,
+.searchableSelectOptions em {
+  min-height: 36px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  background: transparent;
+  color: var(--control-text);
+  text-align: left;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 650;
+}
+
+.searchableSelectOptions button:last-of-type {
+  border-bottom: 0;
+}
+
+.searchableSelectOptions button:hover,
+.searchableSelectOptions button.active {
+  background: var(--control-hover);
+  color: var(--primary);
+}
+
+.searchableSelectOptions em {
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+}
+
+.analyticsSearch span {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--control-icon);
+}
+
+.analyticsSearch input {
+  min-height: 40px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.filterStatic {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  color: var(--control-text);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.applyFilterButton {
+  align-self: center;
+  justify-self: end;
+  min-height: 40px;
+  border: 0;
+  border-radius: 2px;
+  padding: 0 12px;
+  background: #6ec1ee;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.resetFilterButton {
+  align-self: center;
+  justify-self: end;
+  min-height: 40px;
+  border: 1px solid var(--control-border);
+  border-radius: 2px;
+  padding: 0 14px;
+  background: var(--panel);
+  color: var(--control-text);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-transform: uppercase;
 }
 
 .analyticsGrid {
@@ -1664,8 +2025,11 @@ button {
 .analyticsCard {
   display: grid;
   gap: 12px;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
   padding: 16px;
+  background: var(--panel);
+  color: var(--text);
 }
 
 .analyticsCard.wide {
@@ -1760,6 +2124,99 @@ button {
   color: var(--muted);
   font-style: normal;
   font-weight: 850;
+}
+
+.reportTableCard {
+  overflow-x: auto;
+}
+
+.reportTable {
+  min-width: 720px;
+  display: grid;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.reportTableHead,
+.reportTableRow {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.reportTableHead {
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.reportTableRow {
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reportTableRow:last-of-type {
+  border-bottom: 0;
+}
+
+.reportTableRow span,
+.reportTableHead span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reportTableRow i {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 999px;
+}
+
+.reportTableRow span:has(i) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reportTableRow strong {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.reportTable em {
+  padding: 16px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 850;
+}
+
+.detailedReportTable {
+  min-width: 1120px;
+}
+
+.detailedReportTable .reportTableHead,
+.detailedReportTable .reportTableRow {
+  grid-template-columns: 110px 120px minmax(180px, 1.2fr) 130px minmax(180px, 1.2fr) 105px 150px 90px;
+}
+
+.weeklyReportTable .reportTableHead,
+.weeklyReportTable .reportTableRow {
+  grid-template-columns: minmax(240px, 1fr) 120px 120px;
+}
+
+.sharedReportTable .reportTableHead,
+.sharedReportTable .reportTableRow {
+  grid-template-columns: 150px 160px minmax(220px, 1fr) 120px 120px;
 }
 
 .analyticsLegend,
@@ -2329,7 +2786,7 @@ button {
 
   .projectSelect {
     border-left: 0;
-    border-top: 1px dotted #bdc8cf;
+    border-top: 1px dotted var(--control-divider);
   }
 
   .dashboardGrid {
