@@ -1,6 +1,9 @@
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || 'appLFfeTpwkYcWOrn';
 const AIRTABLE_TOKEN = import.meta.env.VITE_AIRTABLE_TOKEN || '';
 const AIRTABLE_API = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`;
+const AIRTABLE_PROXY_URL = import.meta.env.VITE_AIRTABLE_PROXY_URL || '/.netlify/functions/airtable';
+const IS_LOCAL_HOST = typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const USE_AIRTABLE_PROXY = import.meta.env.VITE_AIRTABLE_PROXY === 'true' || !IS_LOCAL_HOST;
 
 const TABLES = {
   users: 'Users',
@@ -31,7 +34,7 @@ function wait(ms) {
 }
 
 function requireToken() {
-  if (!AIRTABLE_TOKEN) {
+  if (!USE_AIRTABLE_PROXY && !AIRTABLE_TOKEN) {
     throw new Error('Add VITE_AIRTABLE_TOKEN to clockfy/client/.env to connect Airtable.');
   }
 }
@@ -45,20 +48,33 @@ function airtableUrl(tableName, recordId = '') {
 
 async function airtableRequest(tableName, options = {}, recordId = '') {
   requireToken();
+  const [name, query = ''] = tableName.split('?');
   const url = airtableUrl(tableName, recordId);
   const tableLabel = tableName.split('?')[0];
   const maxAttempts = 3;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_TOKEN}`,
-          'Content-Type': 'application/json',
-          ...(options.headers || {})
-        }
-      });
+      const response = USE_AIRTABLE_PROXY
+        ? await fetch(AIRTABLE_PROXY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tableName: name,
+            query,
+            recordId,
+            method: options.method || 'GET',
+            fields: options.body ? JSON.parse(options.body).fields : undefined
+          })
+        })
+        : await fetch(url, {
+          ...options,
+          headers: {
+            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json',
+            ...(options.headers || {})
+          }
+        });
       const text = await response.text();
       const data = text ? JSON.parse(text) : null;
       if (response.ok) return data;
