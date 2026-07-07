@@ -5,6 +5,39 @@ import { toDateKey } from '../utils/time.js';
 const AppContext = createContext(null);
 const timeEditorRoles = new Set(['admin', 'super-user']);
 
+function sumEntries(entries) {
+  return entries.reduce((total, entry) => total + Number(entry.duration || 0), 0);
+}
+
+function buildSeries(entries, days) {
+  return Array.from({ length: days }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (days - 1 - index));
+    const key = toDateKey(date);
+    return { date: key, total: sumEntries(entries.filter((entry) => entry.date === key)) };
+  });
+}
+
+function buildDashboard(entries, projects) {
+  const today = toDateKey();
+  const week = new Date();
+  const day = week.getDay();
+  week.setDate(week.getDate() - day + (day === 0 ? -6 : 1));
+  week.setHours(0, 0, 0, 0);
+  const month = new Date();
+  month.setDate(1);
+  month.setHours(0, 0, 0, 0);
+
+  return {
+    todayTotal: sumEntries(entries.filter((entry) => entry.date === today)),
+    weekTotal: sumEntries(entries.filter((entry) => new Date(entry.startTime) >= week)),
+    monthTotal: sumEntries(entries.filter((entry) => new Date(entry.startTime) >= month)),
+    totalProjects: projects.length,
+    weeklySeries: buildSeries(entries, 7),
+    monthlySeries: buildSeries(entries, 30)
+  };
+}
+
 export function AppProvider({ children }) {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
@@ -32,12 +65,11 @@ export function AppProvider({ children }) {
 
   const refresh = useCallback(async () => {
     const [userData, projectData, clientData, entryData] = await Promise.all([api.getUsers(), api.getProjects(), api.getClients(), api.getEntries()]);
-    const dashboardData = await api.getDashboard();
     setUsers(userData);
     setProjects(projectData);
     setClients(clientData);
     setEntries(entryData);
-    setDashboard(dashboardData);
+    setDashboard(buildDashboard(entryData, projectData));
     setSelectedProjectId((current) => current || projectData[0]?.id || '');
   }, []);
 

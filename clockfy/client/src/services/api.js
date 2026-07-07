@@ -26,6 +26,10 @@ const timeEditorRoles = new Set(['admin', 'super-user']);
 let usersSeedPromise = null;
 let projectsSeedPromise = null;
 
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
 function requireToken() {
   if (!AIRTABLE_TOKEN) {
     throw new Error('Add VITE_AIRTABLE_TOKEN to clockfy/client/.env to connect Airtable.');
@@ -41,20 +45,40 @@ function airtableUrl(tableName, recordId = '') {
 
 async function airtableRequest(tableName, options = {}, recordId = '') {
   requireToken();
-  const response = await fetch(airtableUrl(tableName, recordId), {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${AIRTABLE_TOKEN}`,
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
+  const url = airtableUrl(tableName, recordId);
+  const tableLabel = tableName.split('?')[0];
+  const maxAttempts = 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : null;
+      if (response.ok) return data;
+
+      const message = data?.error?.message || data?.message || `Airtable ${response.status}`;
+      const retryable = response.status === 429 || response.status >= 500;
+      if (retryable && attempt < maxAttempts) {
+        await wait(350 * attempt);
+        continue;
+      }
+      throw new Error(`${tableLabel}: ${message}`);
+    } catch (error) {
+      if (attempt < maxAttempts && !String(error.message || '').includes(':')) {
+        await wait(350 * attempt);
+        continue;
+      }
+      throw new Error(error.message || `${tableLabel}: Airtable request failed`);
     }
-  });
-  const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
-  if (!response.ok) {
-    throw new Error(data?.error?.message || data?.message || 'Airtable request failed');
   }
-  return data;
+  throw new Error(`${tableLabel}: Airtable request failed`);
 }
 
 async function listRecords(tableName) {
